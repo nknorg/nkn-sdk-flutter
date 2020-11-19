@@ -6,3 +6,5 @@
 .DS_Store
 /build
 /captures
+/libs/nkn.aar
+/libs/nkn-sources.jar

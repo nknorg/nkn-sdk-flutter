@@ -1,8 +1,8 @@
 name: nkn_sdk_flutter
 description: nkn-sdk-flutter
 version: 0.0.1
-author:
-homepage:
+author: heron
+homepage: https://github.com/iheron
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  logger: ^0.9.4
 
 dev_dependencies:
   flutter_test:
@@ -28,7 +30,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: org.nkn.nkn_sdk_flutter
+        package: org.nkn.sdk
         pluginClass: NknSdkFlutterPlugin
       ios:
         pluginClass: NknSdkFlutterPlugin
