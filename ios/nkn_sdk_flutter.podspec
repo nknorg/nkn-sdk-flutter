@@ -9,13 +9,15 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 nkn-sdk-flutter
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/iheron/nkn-sdk-flutter'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Heron' => 'heron.roman@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '8.0'
+
+  s.vendored_frameworks = 'Frameworks/*.framework'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

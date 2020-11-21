@@ -1,13 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:nkn_sdk_flutter/client.dart';
 import 'package:nkn_sdk_flutter/nkn_sdk.dart';
+import 'package:nkn_sdk_flutter/utils/hex.dart';
 import 'package:nkn_sdk_flutter/wallet.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Wallet.install();
+  Client.install();
   runApp(MyApp());
 }
 
@@ -17,6 +22,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Client _client1;
+  Client _client2;
+
   @override
   void initState() {
     super.initState();
@@ -83,6 +91,71 @@ class _MyAppState extends State<MyApp> {
                       print(hash);
                     },
                     child: Text('transfer'),
+                  ),
+                ],
+              ),
+
+              Text(
+                'Client1',
+                style: TextStyle(fontSize: 16),
+              ),
+              Wrap(
+                children: [
+                  FlatButton(
+                    onPressed: ()async {
+                      Wallet wallet = await Wallet.restore('{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}', '123');
+
+                      _client1 = await Client.create(wallet.seed);
+                      print(_client1);
+                    },
+                    child: Text('create'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      _client1.close();
+                    },
+                    child: Text('close'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      var res = await _client1.sendText([_client2.address], jsonEncode({
+                        'contentType': 'text',
+                        'content': 'hi'
+                      }));
+                      print(res);
+                    },
+                    child: Text('sendText'),
+                  ),
+                ],
+              ),
+              Text(
+                'Client2',
+                style: TextStyle(fontSize: 16),
+              ),
+              Wrap(
+                children: [
+                  FlatButton(
+                    onPressed: ()async {
+                      _client2 = await Client.create(hexDecode('bd8bd3de4dd0f798fac5a0a56e536a8bacd5b7f46d0951d8665fd68d0a910996'));
+                      print(_client2);
+                    },
+                    child: Text('create'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      _client2.close();
+                    },
+                    child: Text('close'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      var res = await _client2.sendText([_client1.address], jsonEncode({
+                        'contentType': 'text',
+                        'content': 'hi2'
+                      }));
+                      print(res);
+                    },
+                    child: Text('sendText'),
                   ),
                 ],
               ),

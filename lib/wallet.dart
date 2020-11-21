@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
@@ -12,43 +12,19 @@ class WalletConfig {
 
 class Wallet {
   static const MethodChannel _methodChannel = MethodChannel('org.nkn.sdk/wallet');
-  static const EventChannel _eventChannel = EventChannel('org.nkn.sdk/wallet/event');
-  static Map<String, Completer> _walletEventQueue = Map<String, Completer>();
 
-  static install() {
-    _eventChannel.receiveBroadcastStream().listen((event) {
-      Map data = event;
-      String key = data['_id'];
-      var result;
-      if (data.containsKey('result')) {
-        result = data['result'];
-      } else {
-        var keys = data.keys.toList();
-        keys.remove('_id');
-        result = Map<String, dynamic>();
-        for (var key in keys) {
-          result[key] = data[key];
-        }
-      }
-
-      _walletEventQueue[key].complete(result);
-    }, onError: (err) {
-      if (_walletEventQueue[err.code] != null) {
-        _walletEventQueue[err.code].completeError(err.message);
-      }
-    });
-  }
+  static install() {}
 
   String address;
-  String seed;
-  String publicKey;
+  Uint8List seed;
+  Uint8List publicKey;
   String keystore;
 
   WalletConfig walletConfig;
 
   Wallet({this.walletConfig});
 
-  static Future<Wallet> create(String seed, String password) async {
+  static Future<Wallet> create(Uint8List seed, String password) async {
     try {
       final Map data = await _methodChannel.invokeMethod('create', {
         'seed': seed,
@@ -83,39 +59,32 @@ class Wallet {
   }
 
   static Future<double> getBalanceByAddr(String address, {WalletConfig config}) async {
-    Completer<double> completer = Completer<double>();
-    String id = completer.hashCode.toString();
-    _walletEventQueue[id] = completer;
-    _methodChannel.invokeMethod('getBalance', {
-      '_id': id,
-      'address': address,
-      'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
-    });
-
-    return completer.future.whenComplete(() {
-      _walletEventQueue.remove(id);
-    });
+    try {
+      return await _methodChannel.invokeMethod('getBalance', {
+        'address': address,
+        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
+      });
+    } catch (e) {
+      throw e;
+    }
   }
 
   Future<double> getBalance() async {
-    return await getBalanceByAddr(this.address);
+    return getBalanceByAddr(this.address);
   }
 
-  Future<String> transfer(String address, String amount, {String fee ='0',WalletConfig config}) async {
-    Completer<String> completer = Completer<String>();
-    String id = completer.hashCode.toString();
-    _walletEventQueue[id] = completer;
-    _methodChannel.invokeMethod('transfer', {
-      '_id': id,
-      'seed': this.seed,
-      'address': address,
-      'amount': amount,
-      'fee': fee,
-      'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
-    });
-    return completer.future.whenComplete(() {
-      _walletEventQueue.remove(id);
-    });
+  Future<String> transfer(String address, String amount, {String fee = '0', WalletConfig config}) async {
+    try {
+      return await _methodChannel.invokeMethod('transfer', {
+        'seed': this.seed,
+        'address': address,
+        'amount': amount,
+        'fee': fee,
+        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
+      });
+    } catch (e) {
+      return null;
+    }
   }
 
   static Future<String> pubKeyToWalletAddr(String publicKey) async {
