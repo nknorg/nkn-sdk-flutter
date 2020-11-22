@@ -100,4 +100,108 @@ class Client {
       throw e;
     }
   }
+
+  Future<Message> publishText(String topic, String data, {int maxHoldingSeconds = 8640000}) async {
+    try {
+      final Map resp = await _methodChannel.invokeMethod('publishText', {
+        '_id': this.address,
+        'topic': topic,
+        'data': data,
+        'maxHoldingSeconds': maxHoldingSeconds,
+      });
+      Message message = Message(
+        messageId: resp['messageId'],
+        data: resp['data'],
+        type: resp['type'],
+        encrypted: resp['encrypted'],
+        src: resp['src'],
+      );
+      return message;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<String> subscribe({
+    String identifier = '',
+    String topic,
+    int duration = 400000,
+    String fee = '0',
+    String meta = '',
+  }) async {
+    try {
+      String hash = await _methodChannel.invokeMethod('subscribe', {
+        '_id': this.address,
+        'identifier': identifier,
+        'topic': topic,
+        'duration': duration,
+        'fee': fee,
+        'meta': meta,
+      });
+      return hash;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<String> unsubscribe({String identifier = '', String topic, String fee = '0'}) async {
+    try {
+      String hash = await _methodChannel.invokeMethod('unsubscribe', {
+        '_id': this.address,
+        'identifier': identifier,
+        'topic': topic,
+        'fee': fee,
+      });
+      return hash;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<int> getSubscribersCount({String topic}) async {
+    try {
+      int count = await _methodChannel.invokeMethod('getSubscribersCount', {
+        '_id': this.address,
+        'topic': topic,
+      });
+      return count;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<Map<dynamic, dynamic>> getSubscription({String topic, String subscriber}) async {
+    try {
+      Map<dynamic, dynamic> resp = await _methodChannel.invokeMethod('getSubscription', {
+        '_id': this.address,
+        'topic': topic,
+        'subscriber': subscriber,
+      });
+      return resp;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<Map<dynamic, dynamic>> getSubscribers({
+    String topic,
+    int offset = 0,
+    int limit = 10000,
+    bool meta = true,
+    bool txPool = true,
+  }) async {
+    try {
+      Map<dynamic, dynamic> resp = await _methodChannel.invokeMethod('getSubscribers', {
+        '_id': this.address,
+        'topic': topic,
+        'offset': offset,
+        'limit': limit,
+        'meta': meta,
+        'txPool': txPool,
+      });
+      return resp;
+    } catch (e) {
+      throw e;
+    }
+  }
 }

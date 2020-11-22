@@ -1,11 +1,10 @@
 import Nkn
 
-class Wallet : NSObject, IChannelHandler, FlutterStreamHandler {
+class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
     let walletQueue = DispatchQueue(label: "org.nkn.sdk/wallet/queue", qos: .default, attributes: .concurrent)
     var methodChannel: FlutterMethodChannel?
     var eventSink: FlutterEventSink?
     let CHANNEL_NAME = "org.nkn.sdk/wallet"
-    let EVENT_NAME = "org.nkn.sdk/wallet/event"
     
     func install(binaryMessenger: FlutterBinaryMessenger) {
         self.methodChannel = FlutterMethodChannel(name: CHANNEL_NAME, binaryMessenger: binaryMessenger)
@@ -24,13 +23,6 @@ class Wallet : NSObject, IChannelHandler, FlutterStreamHandler {
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
         eventSink = nil
         return nil
-    }
-    
-    private func resultError(_ error: NSError?, code: String? = nil) -> FlutterError {
-        return FlutterError(code: code ?? String(error?.code ?? 0), message: error?.localizedDescription, details: "")
-    }
-    private func resultError(_ error: Error?, code: String? = "") -> FlutterError {
-        return FlutterError(code: code ?? "", message: error?.localizedDescription, details: "")
     }
     
     private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -56,9 +48,9 @@ class Wallet : NSObject, IChannelHandler, FlutterStreamHandler {
         let password = args["password"] as? String ?? ""
         var error: NSError?
         let account:NknAccount? = NknNewAccount(seed?.data, &error)
-        let config = NknWalletConfig.init()
+        let config = NknWalletConfig()
         config.password = password
-        let wallet = NknWallet.init(account, config: config)
+        let wallet = NknWallet(account, config: config)
         let json = wallet?.toJSON(nil)
         var resp:[String:Any] = [String:Any]()
         resp["address"] = wallet?.address()
@@ -76,12 +68,12 @@ class Wallet : NSObject, IChannelHandler, FlutterStreamHandler {
             result(nil)
             return
         }
-        let config = NknWalletConfig.init()
+        let config = NknWalletConfig()
         config.password = password
         var error: NSError?
         let wallet = NknWalletFromJSON(keystore, config, &error)
         if (error != nil) {
-            result(resultError( error, code: ""))
+            resultError(result: result, error: error)
             return
         }
         let json = wallet?.toJSON(nil)
@@ -99,7 +91,7 @@ class Wallet : NSObject, IChannelHandler, FlutterStreamHandler {
         var error: NSError?
         let address = NknPubKeyToWalletAddr(Data(hex: publicKey), &error)
         if (error != nil) {
-            result(resultError( error))
+            resultError(result: result, error: error)
             return
         }
         result(address)
@@ -111,22 +103,24 @@ class Wallet : NSObject, IChannelHandler, FlutterStreamHandler {
         let seedRpc = args["seedRpc"] as? String
         
         var error: NSError?
-        let account = NknAccount.init(NknRandomBytes(32, &error))
+        let account = NknAccount(NknRandomBytes(32, &error))
         if(error != nil) {
-            result(resultError(error))
+            resultError(result: result, error: error)
             return
         }
-        let config = NknWalletConfig.init()
+        let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray.init(from: seedRpc)
+            config.seedRPCServerAddr = NknStringArray(from: seedRpc)
         }
-        let wallet = NknWallet.init(account, config: config)
+        let wallet = NknWallet(account, config: config)
         walletQueue.async {
             do {
                 let balance: NknAmount? = try wallet?.balance(byAddress: address)
-                result(Double(balance!.string()))
+                self.resultSuccess(result: result, resp: Double(balance!.string()))
+                return
             } catch let error {
-                result(self.resultError(error))
+                self.resultError(result: result, error: error)
+                return
             }
         }
     }
@@ -142,28 +136,29 @@ class Wallet : NSObject, IChannelHandler, FlutterStreamHandler {
         var error: NSError?
         let account:NknAccount? = NknNewAccount(seed?.data, &error)
         if (error != nil) {
-            result(self.resultError(error))
+            self.resultError(result: result, error: error)
             return
         }
-        let config = NknWalletConfig.init()
+        let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray.init(from: seedRpc)
+            config.seedRPCServerAddr = NknStringArray(from: seedRpc)
         }
         walletQueue.async {
             let wallet = NknNewWallet(account, config, &error)
             if (error != nil) {
-                result(self.resultError(error))
+                self.resultError(result: result,error: error)
                 return
             }
             
-            let transactionConfig: NknTransactionConfig = NknTransactionConfig.init()
+            let transactionConfig: NknTransactionConfig = NknTransactionConfig()
             transactionConfig.fee = fee
             let hash = wallet?.transfer(address, amount: amount, config: transactionConfig, error: &error)
             if (error != nil) {
-                result(self.resultError(error))
+                self.resultError(result: result, error: error)
                 return
             }
-            result(hash)
+            self.resultSuccess(result: result, resp: hash)
+            return
         }
     }
 }

@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:nkn_sdk_flutter/client.dart';
 import 'package:nkn_sdk_flutter/nkn_sdk.dart';
+import 'package:nkn_sdk_flutter/utils/hash.dart';
 import 'package:nkn_sdk_flutter/utils/hex.dart';
 import 'package:nkn_sdk_flutter/wallet.dart';
 
@@ -125,6 +126,41 @@ class _MyAppState extends State<MyApp> {
                       print(res);
                     },
                     child: Text('sendText'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      var res = await _client1.subscribe(topic: genChannelId('ttest'));
+                      print(res);
+                    },
+                    child: Text('subscribe'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      var res = await _client1.unsubscribe(topic: genChannelId('ttest'));
+                      print(res);
+                    },
+                    child: Text('unsubscribe'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      var res = await _client1.getSubscribersCount(topic: genChannelId('ttest'));
+                      print(res);
+                    },
+                    child: Text('getSubscribersCount'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      var res = await _client1.getSubscription(topic: genChannelId('ttest'), subscriber: _client1.address);
+                      print(res);
+                    },
+                    child: Text('getSubscription'),
+                  ),
+                  FlatButton(
+                    onPressed: ()async {
+                      var res = await _client1.getSubscribers(topic: genChannelId('ttest'));
+                      print(res);
+                    },
+                    child: Text('getSubscribers'),
                   ),
                 ],
               ),

@@ -6,6 +6,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.nkn.sdk.IChannelHandler
 import nkn.Nkn
@@ -117,13 +118,13 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             config.seedRPCServerAddr = StringArray(seedRpc)
         }
         val wallet = Nkn.newWallet(account, config)
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val balance = wallet.balanceByAddress(address).toString()
-                result.success(balance.toDouble())
+                resultSuccess(result, balance.toDouble())
                 return@launch
             } catch (e: Throwable) {
-                result.error("", e.localizedMessage, e.message)
+                resultError(result, e)
                 return@launch
             }
         }
@@ -139,17 +140,17 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         if (seedRpc != null) {
             config.seedRPCServerAddr = StringArray(seedRpc)
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = Nkn.newAccount(seed)
                 val wallet = Nkn.newWallet(account, config)
                 val transactionConfig = TransactionConfig()
                 transactionConfig.fee = fee
                 val hash = wallet.transfer(address, amount, transactionConfig)
-                result.success(hash)
+                resultSuccess(result, hash)
                 return@launch
             } catch (e: Throwable) {
-                result.error("", e.localizedMessage, e.message)
+                resultError(result, e)
                 return@launch
             }
         }
