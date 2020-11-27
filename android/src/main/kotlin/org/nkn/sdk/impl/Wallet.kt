@@ -3,6 +3,7 @@ package org.nkn.sdk.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -23,8 +24,8 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val CHANNEL_NAME = "org.nkn.sdk/wallet"
     }
 
-    override fun install(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        methodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME)
+    override fun install(binaryMessenger: BinaryMessenger) {
+        methodChannel = MethodChannel(binaryMessenger, CHANNEL_NAME)
         methodChannel.setMethodCallHandler(this)
     }
 

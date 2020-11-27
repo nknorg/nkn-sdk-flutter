@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -28,10 +29,10 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val EVENT_NAME = "org.nkn.sdk/client/event"
     }
 
-    override fun install(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        methodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME)
+    override fun install(binaryMessenger: BinaryMessenger) {
+        methodChannel = MethodChannel(binaryMessenger, CHANNEL_NAME)
         methodChannel.setMethodCallHandler(this)
-        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, EVENT_NAME)
+        eventChannel = EventChannel(binaryMessenger, EVENT_NAME)
         eventChannel.setStreamHandler(this)
     }
 

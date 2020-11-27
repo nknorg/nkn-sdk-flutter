@@ -1,14 +1,14 @@
 package org.nkn.sdk
 
 import androidx.annotation.NonNull
-import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 interface IChannelHandler {
-    fun install(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding)
+    fun install(@NonNull binaryMessenger: BinaryMessenger)
     fun uninstall()
 
     suspend fun resultSuccess(result: MethodChannel.Result, resp: Any?) = withContext(Dispatchers.Main) {

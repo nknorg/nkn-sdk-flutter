@@ -3,6 +3,7 @@ package org.nkn.sdk.impl
 import android.os.Handler
 import android.os.Looper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -19,8 +20,8 @@ class Common : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val EVENT_NAME = "org.nkn.sdk/common/event"
     }
 
-    override fun install(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME)
+    override fun install(binaryMessenger: BinaryMessenger) {
+        channel = MethodChannel(binaryMessenger, CHANNEL_NAME)
         channel.setMethodCallHandler(this)
     }
 

@@ -14,9 +14,9 @@ class NknSdkFlutterPlugin : FlutterPlugin {
     private val client: Client = Client()
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        common.install(flutterPluginBinding)
-        wallet.install(flutterPluginBinding)
-        client.install(flutterPluginBinding)
+        common.install(flutterPluginBinding.binaryMessenger)
+        wallet.install(flutterPluginBinding.binaryMessenger)
+        client.install(flutterPluginBinding.binaryMessenger)
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
