@@ -3,14 +3,27 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
-class Message {
+class MessageType {
+  static const int BINARY = 0;
+  static const int TEXT = 1;
+  static const int ACK = 2;
+  static const int SESSION = 3;
+}
+
+class OnConnect {
+  Map node;
+
+  OnConnect({this.node});
+}
+
+class OnMessage {
   Uint8List messageId;
   String src;
-  Map data;
+  String data;
   int type;
   bool encrypted;
 
-  Message({this.messageId, this.data, this.src, this.type, this.encrypted});
+  OnMessage({this.messageId, this.data, this.src, this.type, this.encrypted});
 }
 
 class ClientConfig {
@@ -22,32 +35,11 @@ class ClientConfig {
 class Client {
   static const MethodChannel _methodChannel = MethodChannel('org.nkn.sdk/client');
   static const EventChannel _eventChannel = EventChannel('org.nkn.sdk/client/event');
-  static Map<String, Completer> _clientEventQueue = Map<String, Completer>();
+
+  static Stream _stream;
 
   static install() {
-    _eventChannel.receiveBroadcastStream().listen((res) {
-      final String event = res['event'].toString();
-
-      // Map data = event;
-      // String key = data['_id'];
-      // var result;
-      // if (data.containsKey('result')) {
-      //   result = data['result'];
-      // } else {
-      //   var keys = data.keys.toList();
-      //   keys.remove('_id');
-      //   result = Map<String, dynamic>();
-      //   for (var key in keys) {
-      //     result[key] = data[key];
-      //   }
-      // }
-
-      // _clientEventQueue[key].complete(result);
-    }, onError: (err) {
-      if (_clientEventQueue[err.code] != null) {
-        _clientEventQueue[err.code].completeError(err.message);
-      }
-    });
+    _stream = _eventChannel.receiveBroadcastStream();
   }
 
   String address;
@@ -55,6 +47,26 @@ class Client {
   Uint8List publicKey;
 
   ClientConfig clientConfig;
+
+  StreamController<OnConnect> _onConnectStreamController = StreamController<OnConnect>.broadcast();
+
+  StreamSink<OnConnect> get _onConnectStreamSink => _onConnectStreamController.sink;
+
+  Stream<OnConnect> get onConnect => _onConnectStreamController.stream;
+
+  StreamController<OnMessage> _onMessageStreamController = StreamController<OnMessage>.broadcast();
+
+  StreamSink<OnMessage> get _onMessageStreamSink => _onMessageStreamController.sink;
+
+  Stream<OnMessage> get onMessage => _onMessageStreamController.stream;
+
+  StreamController<dynamic> _onErrorStreamController = StreamController<dynamic>.broadcast();
+
+  StreamSink<dynamic> get _onErrorStreamSink => _onErrorStreamController.sink;
+
+  Stream<dynamic> get onError => _onErrorStreamController.stream;
+
+  StreamSubscription eventChannelStreamSubscription;
 
   Client({this.clientConfig});
 
@@ -69,6 +81,34 @@ class Client {
       client.address = resp['address'];
       client.publicKey = resp['publicKey'];
       client.seed = resp['seed'];
+
+      client.eventChannelStreamSubscription = _stream.where((res) => res['_id'] == client.address).listen((res) {
+        Map data = res['data'];
+        if (res['_id'] != client.address) {
+          return;
+        }
+        switch (res['event']) {
+          case 'onConnect':
+            client._onConnectStreamSink.add(OnConnect(node: res['node']));
+            break;
+          case 'onMessage':
+            client._onMessageStreamSink.add(OnMessage(
+              src: data['src'],
+              type: data['type'],
+              messageId: data['messageId'],
+              data: data['data'],
+              encrypted: data['encrypted'],
+            ));
+            break;
+          default:
+            break;
+        }
+      }, onError: (err) {
+        if (err.code != client.address) {
+          return;
+        }
+        client._onErrorStreamSink.add(err);
+      });
       return client;
     } catch (e) {
       throw e;
@@ -76,10 +116,17 @@ class Client {
   }
 
   Future<void> close() async {
+    if (!(this.address?.isNotEmpty == true)) {
+      return;
+    }
     await _methodChannel.invokeMethod('close', {'_id': this.address});
+    _onConnectStreamController?.close();
+    _onMessageStreamController?.close();
+    _onErrorStreamController?.close();
+    eventChannelStreamSubscription?.cancel();
   }
 
-  Future<Message> sendText(List<String> dests, String data, {int maxHoldingSeconds = 8640000, noReply = true}) async {
+  Future<OnMessage> sendText(List<String> dests, String data, {int maxHoldingSeconds = 8640000, noReply = true}) async {
     try {
       final Map resp = await _methodChannel.invokeMethod('sendText', {
         '_id': this.address,
@@ -88,7 +135,7 @@ class Client {
         'noReply': noReply,
         'maxHoldingSeconds': maxHoldingSeconds,
       });
-      Message message = Message(
+      OnMessage message = OnMessage(
         messageId: resp['messageId'],
         data: resp['data'],
         type: resp['type'],
@@ -101,7 +148,7 @@ class Client {
     }
   }
 
-  Future<Message> publishText(String topic, String data, {int maxHoldingSeconds = 8640000}) async {
+  Future<OnMessage> publishText(String topic, String data, {int maxHoldingSeconds = 8640000}) async {
     try {
       final Map resp = await _methodChannel.invokeMethod('publishText', {
         '_id': this.address,
@@ -109,7 +156,7 @@ class Client {
         'data': data,
         'maxHoldingSeconds': maxHoldingSeconds,
       });
-      Message message = Message(
+      OnMessage message = OnMessage(
         messageId: resp['messageId'],
         data: resp['data'],
         type: resp['type'],

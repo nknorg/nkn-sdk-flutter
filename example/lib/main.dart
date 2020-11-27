@@ -105,9 +105,21 @@ class _MyAppState extends State<MyApp> {
                   FlatButton(
                     onPressed: ()async {
                       Wallet wallet = await Wallet.restore('{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}', '123');
-
+                      await _client1?.close();
                       _client1 = await Client.create(wallet.seed);
-                      print(_client1);
+                      _client1.onConnect.listen((event) {
+                        print('------onConnect1-----');
+                        print(event.node);
+                      });
+                      _client1.onMessage.listen((event) {
+                        print('------onMessage1-----');
+                        print(event.type);
+                        print(event.encrypted);
+                        print(event.messageId);
+                        print(event.data);
+                        print(event.src);
+                      });
+
                     },
                     child: Text('create'),
                   ),
@@ -172,8 +184,21 @@ class _MyAppState extends State<MyApp> {
                 children: [
                   FlatButton(
                     onPressed: ()async {
+                      await _client2?.close();
                       _client2 = await Client.create(hexDecode('bd8bd3de4dd0f798fac5a0a56e536a8bacd5b7f46d0951d8665fd68d0a910996'));
-                      print(_client2);
+                      _client2.onConnect.listen((event) {
+                        print('------onConnect2-----');
+                        print(event.node);
+                      });
+                      _client2.onMessage.listen((event) {
+                        print('------onMessage2-----');
+                        print(event.type);
+                        print(event.encrypted);
+                        print(event.messageId);
+                        print(event.data);
+                        print(event.src);
+                      });
+
                     },
                     child: Text('create'),
                   ),
