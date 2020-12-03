@@ -130,14 +130,17 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let seed = args["seed"] as? FlutterStandardTypedData
         let seedRpc = args["seedRpc"] as? String
         
-        var error: NSError?
-        let config: NknClientConfig = NknClientConfig()
-        if(seedRpc != nil){
-            config.seedRPCServerAddr = NknStringArray(from: seedRpc)
-        }
-        let account = NknNewAccount(seed?.data, &error)!
-        
         clientQueue.async {
+            var error: NSError?
+            let config: NknClientConfig = NknClientConfig()
+            if(seedRpc != nil){
+                config.seedRPCServerAddr = NknStringArray(from: seedRpc)
+            }
+            let account = NknNewAccount(seed?.data, &error)!
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
             let client = self.createClient(account: account, identifier: identifier, config: config)
             var resp:[String:Any] = [String:Any]()
             resp["address"] = client.address()

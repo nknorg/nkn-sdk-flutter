@@ -24,7 +24,7 @@ class Wallet {
 
   Wallet({this.walletConfig});
 
-  static Future<Wallet> create(Uint8List seed, String password) async {
+  static Future<Wallet> create(String seed, String password) async {
     try {
       final Map data = await _methodChannel.invokeMethod('create', {
         'seed': seed,

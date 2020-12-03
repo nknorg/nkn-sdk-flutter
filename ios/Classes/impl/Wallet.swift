@@ -101,19 +101,19 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let args = call.arguments as! [String: Any]
         let address = args["address"] as? String
         let seedRpc = args["seedRpc"] as? String
-        
-        var error: NSError?
-        let account = NknAccount(NknRandomBytes(32, &error))
-        if(error != nil) {
-            resultError(result: result, error: error)
-            return
-        }
-        let config = NknWalletConfig()
-        if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: seedRpc)
-        }
-        let wallet = NknWallet(account, config: config)
+
         walletQueue.async {
+            var error: NSError?
+            let account = NknAccount(NknRandomBytes(32, &error))
+            if(error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+            let config = NknWalletConfig()
+            if(seedRpc != nil) {
+                config.seedRPCServerAddr = NknStringArray(from: seedRpc)
+            }
+            let wallet = NknWallet(account, config: config)
             do {
                 let balance: NknAmount? = try wallet?.balance(byAddress: address)
                 self.resultSuccess(result: result, resp: Double(balance!.string()))
@@ -132,18 +132,18 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let amount = args["amount"] as? String
         let fee = args["fee"] as! String
         let seedRpc = args["seedRpc"] as? String
-        
-        var error: NSError?
-        let account:NknAccount? = NknNewAccount(seed?.data, &error)
-        if (error != nil) {
-            self.resultError(result: result, error: error)
-            return
-        }
-        let config = NknWalletConfig()
-        if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: seedRpc)
-        }
+
         walletQueue.async {
+            var error: NSError?
+            let account:NknAccount? = NknNewAccount(seed?.data, &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+            let config = NknWalletConfig()
+            if(seedRpc != nil) {
+                config.seedRPCServerAddr = NknStringArray(from: seedRpc)
+            }
             let wallet = NknNewWallet(account, config, &error)
             if (error != nil) {
                 self.resultError(result: result,error: error)

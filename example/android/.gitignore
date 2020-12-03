@@ -12,3 +12,5 @@ key.properties
 
 /app/libs/nkn.aar
 /app/libs/nkn-sources.jar
+/golib/nkn.aar
+/golib/nkn-sources.jar

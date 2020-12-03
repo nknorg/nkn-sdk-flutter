@@ -90,15 +90,19 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         }
         val config = WalletConfig()
         config.password = password
-        val wallet = Nkn.walletFromJSON(keystore, config)
-        val json = wallet?.toJSON()
-        val resp = hashMapOf(
-                "address" to wallet.address(),
-                "keystore" to json,
-                "publicKey" to wallet.pubKey(),
-                "seed" to wallet.seed()
-        )
-        result.success(resp)
+        try {
+            val wallet = Nkn.walletFromJSON(keystore, config)
+            val json = wallet?.toJSON()
+            val resp = hashMapOf(
+                    "address" to wallet.address(),
+                    "keystore" to json,
+                    "publicKey" to wallet.pubKey(),
+                    "seed" to wallet.seed()
+            )
+            result.success(resp)
+        } catch (e: Throwable) {
+            result.error("", e.localizedMessage, e.message)
+        }
     }
 
     private fun pubKeyToWalletAddr(call: MethodCall, result: MethodChannel.Result) {
