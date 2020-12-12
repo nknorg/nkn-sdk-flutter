@@ -348,7 +348,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         }
         val client = clientMap[_id]
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val subscribers = client!!.getSubscribers(topic, offset.toLong(), limit.toLong(), meta, txPool)
 
@@ -379,7 +379,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         }
         val client = clientMap[_id]
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val subscription = client!!.getSubscription(topic, subscriber)
                 val resp = hashMapOf(
@@ -405,7 +405,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         }
         val client = clientMap[_id]
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val count = client!!.getSubscribersCount(topic)
                 resultSuccess(result, count)
