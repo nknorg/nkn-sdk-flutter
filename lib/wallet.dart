@@ -10,6 +10,12 @@ class WalletConfig {
   WalletConfig({this.password, this.seedRPCServerAddr});
 }
 
+class RpcConfig {
+  final List<String> seedRPCServerAddr;
+
+  RpcConfig({this.seedRPCServerAddr});
+}
+
 class Wallet {
   static const MethodChannel _methodChannel = MethodChannel('org.nkn.sdk/wallet');
 
@@ -95,6 +101,47 @@ class Wallet {
       return address;
     } catch (e) {
       return null;
+    }
+  }
+
+  static Future<int> getSubscribersCount(String topic, {RpcConfig config}) async {
+    try {
+      int count = await _methodChannel.invokeMethod('getSubscribersCount', {
+        'topic': topic,
+        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
+      });
+      return count;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<Map<dynamic, dynamic>> getSubscription(String topic, String subscriber, {RpcConfig config}) async {
+    try {
+      Map<dynamic, dynamic> resp = await _methodChannel.invokeMethod('getSubscription', {
+        'topic': topic,
+        'subscriber': subscriber,
+        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
+      });
+      return resp;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<Map<dynamic, dynamic>> getSubscribers({String topic, int offset = 0, int limit = 10000, bool meta = true, bool txPool = true, RpcConfig config}) async {
+    try {
+      Map<dynamic, dynamic> resp = await _methodChannel.invokeMethod('getSubscribers', {
+        'topic': topic,
+        'offset': offset,
+        'limit': limit,
+        'meta': meta,
+        'txPool': txPool,
+        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
+      });
+      return resp;
+    } catch (e) {
+      throw e;
     }
   }
 }

@@ -152,11 +152,14 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
     private fun create(call: MethodCall, result: MethodChannel.Result) {
         val identifier = call.argument<String>("identifier") ?: ""
         val seed = call.argument<ByteArray>("seed")
-        val seedRpc = call.argument<String?>("seedRpc")
+        val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
 
         val config = ClientConfig()
         if (seedRpc != null) {
-            config.seedRPCServerAddr = StringArray(seedRpc)
+            config.seedRPCServerAddr = StringArray(null)
+            for (addr in seedRpc) {
+                config.seedRPCServerAddr.append(addr)
+            }
         }
         val account = Nkn.newAccount(seed)
 
@@ -340,7 +343,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val offset = call.argument<Int>("offset") ?: 0
         val limit = call.argument<Int>("limit") ?: 0
         val meta = call.argument<Boolean>("meta") ?: true
-        val txPool = call.argument<Boolean>("txPool") ?: true
+        val txPool = call.argument<Boolean>("txPool") ?: false
 
         if (!clientMap.containsKey(_id)) {
             result.error("", "client is null", "")
