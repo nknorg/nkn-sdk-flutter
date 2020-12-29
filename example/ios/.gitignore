@@ -31,4 +31,4 @@ Runner/GeneratedPluginRegistrant.*
 !default.pbxuser
 !default.perspectivev3
 
-Frameworks/Nkn.framework/
+Frameworks/*.framework
