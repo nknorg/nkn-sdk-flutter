@@ -16,18 +16,17 @@ import org.nkn.sdk.IChannelHandler
 import org.bouncycastle.util.encoders.Hex
 
 class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, ViewModel() {
-    private val TAG: String = this.javaClass.name
-    private var clientMap: HashMap<String, MultiClient?> = hashMapOf()
-
     companion object {
-
-        lateinit var methodChannel: MethodChannel
-        lateinit var eventChannel: EventChannel
-        var eventSink: EventChannel.EventSink? = null
-        val handler: Handler = Handler(Looper.getMainLooper())
         val CHANNEL_NAME = "org.nkn.sdk/client"
         val EVENT_NAME = "org.nkn.sdk/client/event"
     }
+
+    private val TAG: String = this.javaClass.name
+    private var clientMap: HashMap<String, MultiClient?> = hashMapOf()
+
+    lateinit var methodChannel: MethodChannel
+    lateinit var eventChannel: EventChannel
+    var eventSink: EventChannel.EventSink? = null
 
     override fun install(binaryMessenger: BinaryMessenger) {
         methodChannel = MethodChannel(binaryMessenger, CHANNEL_NAME)
