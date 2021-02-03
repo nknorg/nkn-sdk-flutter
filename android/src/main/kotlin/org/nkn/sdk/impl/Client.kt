@@ -1,11 +1,8 @@
 package org.nkn.sdk.impl
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -14,6 +11,7 @@ import kotlinx.coroutines.*
 import nkn.*
 import org.nkn.sdk.IChannelHandler
 import org.bouncycastle.util.encoders.Hex
+import org.nkn.sdk.NknSdkFlutterPlugin
 
 class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, ViewModel() {
     companion object {
@@ -21,7 +19,6 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val EVENT_NAME = "org.nkn.sdk/client/event"
     }
 
-    private val TAG: String = this.javaClass.name
     private var clientMap: HashMap<String, MultiClient?> = hashMapOf()
 
     lateinit var methodChannel: MethodChannel
@@ -81,7 +78,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                     "node" to hashMapOf("address" to node.addr, "publicKey" to node.pubKey),
                     "client" to hashMapOf("address" to client.address())
             )
-            Log.d(TAG, resp.toString())
+            Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
             eventSinkSuccess(eventSink, resp)
         } catch (e: Throwable) {
             eventSinkError(eventSink, client.address(), e.localizedMessage)
@@ -102,7 +99,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                             "messageId" to msg.messageID
                     )
             )
-            Log.d(TAG, resp.toString())
+            Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
             eventSinkSuccess(eventSink, resp)
         } catch (e: Throwable) {
             eventSinkError(eventSink, client.address(), e.localizedMessage)

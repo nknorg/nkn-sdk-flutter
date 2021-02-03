@@ -13,12 +13,12 @@ import org.nkn.sdk.IChannelHandler
 import org.bouncycastle.util.encoders.Hex
 
 class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, ViewModel() {
-
     companion object {
-        lateinit var methodChannel: MethodChannel
-        var eventSink: EventChannel.EventSink? = null
         val CHANNEL_NAME = "org.nkn.sdk/wallet"
     }
+
+    lateinit var methodChannel: MethodChannel
+    var eventSink: EventChannel.EventSink? = null
 
     override fun install(binaryMessenger: BinaryMessenger) {
         methodChannel = MethodChannel(binaryMessenger, CHANNEL_NAME)

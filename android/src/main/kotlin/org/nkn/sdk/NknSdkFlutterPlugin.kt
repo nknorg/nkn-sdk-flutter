@@ -9,6 +9,10 @@ import org.nkn.sdk.impl.Wallet
 
 /** NknSdkFlutterPlugin */
 class NknSdkFlutterPlugin : FlutterPlugin {
+    companion object {
+        const val TAG = "nkn-sdk-flutter"
+    }
+
     private val common: Common = Common()
     private val wallet: Wallet = Wallet()
     private val client: Client = Client()
