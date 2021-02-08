@@ -246,6 +246,8 @@ github.com/nknorg/nkn-sdk-go v1.3.3-0.20200929045039-782285f049ca h1:z6/wSiGrcaO
 github.com/nknorg/nkn-sdk-go v1.3.3-0.20200929045039-782285f049ca/go.mod h1:QjUExWVnRlVgxH9YoueWYlwqg957aHxkAwY8YdLdnd0=
 github.com/nknorg/nkn-sdk-go v1.3.3 h1:nI9rFca/5CrBZhO0gFMoU9KRPbPr2YEmkMwu49gHJXo=
 github.com/nknorg/nkn-sdk-go v1.3.3/go.mod h1:JSksFP+VQ0S54Ztiht6WHC3tNZklcGg+JaxENuFnqRc=
+github.com/nknorg/nkn-sdk-go v1.3.4 h1:QC09vX6/2ft3nUXYC2iI//g1GHpMVYWqnARVQkkmORE=
+github.com/nknorg/nkn-sdk-go v1.3.4/go.mod h1:JSksFP+VQ0S54Ztiht6WHC3tNZklcGg+JaxENuFnqRc=
 github.com/nknorg/nkn/v2 v2.0.1 h1:eAFL+/y17gLJvQpInlF7WLlyPDU1mMSmUEYdUS8ciVU=
 github.com/nknorg/nkn/v2 v2.0.1/go.mod h1:LxKZTpn5VZTAbjsACSFL5nlQAQ4+WQKyIpVZUYopXm4=
 github.com/nknorg/nkn/v2 v2.0.6 h1:spbY0WzPBNe1xgrNB/d0coUmXK8tzv44fjvL5YAAF2k=

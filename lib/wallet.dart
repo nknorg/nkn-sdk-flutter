@@ -30,13 +30,13 @@ class Wallet {
 
   Wallet({this.walletConfig});
 
-  static Future<Wallet> create(String seed, String password) async {
+  static Future<Wallet> create(String seed, {WalletConfig config}) async {
     try {
       final Map data = await _methodChannel.invokeMethod('create', {
         'seed': seed,
-        'password': password,
+        'password': config.password,
       });
-      Wallet wallet = Wallet();
+      Wallet wallet = Wallet(walletConfig: config);
       wallet.keystore = data['keystore'];
       wallet.address = data['address'];
       wallet.seed = data['seed'];
@@ -47,13 +47,13 @@ class Wallet {
     }
   }
 
-  static Future<Wallet> restore(String keystore, String password) async {
+  static Future<Wallet> restore(String keystore, {WalletConfig config}) async {
     try {
       final Map data = await _methodChannel.invokeMethod('restore', {
         'keystore': keystore,
-        'password': password,
+        'password': config.password,
       });
-      Wallet wallet = Wallet();
+      Wallet wallet = Wallet(walletConfig: config);
       wallet.keystore = data['keystore'];
       wallet.address = data['address'];
       wallet.seed = data['seed'];
@@ -76,17 +76,18 @@ class Wallet {
   }
 
   Future<double> getBalance() async {
-    return getBalanceByAddr(this.address);
+    return getBalanceByAddr(this.address, config: this.walletConfig);
   }
 
-  Future<String> transfer(String address, String amount, {String fee = '0', WalletConfig config}) async {
+  Future<String> transfer(String address, String amount, {String fee = '0', int nonce, Uint8List attributes}) async {
     try {
       return await _methodChannel.invokeMethod('transfer', {
         'seed': this.seed,
         'address': address,
         'amount': amount,
         'fee': fee,
-        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
+        'attributes': attributes,
+        'seedRpc': this.walletConfig?.seedRPCServerAddr,
       });
     } catch (e) {
       return null;
@@ -116,22 +117,25 @@ class Wallet {
     }
   }
 
-  static Future<Map<dynamic, dynamic>> getSubscription(String topic, String subscriber, {RpcConfig config}) async {
+  static Future<Map<String, dynamic>> getSubscription(String topic, String subscriber, {RpcConfig config}) async {
     try {
-      Map<dynamic, dynamic> resp = await _methodChannel.invokeMethod('getSubscription', {
+      Map resp = await _methodChannel.invokeMethod('getSubscription', {
         'topic': topic,
         'subscriber': subscriber,
         'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
       });
-      return resp;
+      if (resp == null) {
+        return null;
+      }
+      return Map<String, dynamic>.from(resp);
     } catch (e) {
       throw e;
     }
   }
 
-  static Future<Map<dynamic, dynamic>> getSubscribers({String topic, int offset = 0, int limit = 10000, bool meta = true, bool txPool = true, RpcConfig config}) async {
+  static Future<Map<String, dynamic>> getSubscribers({String topic, int offset = 0, int limit = 10000, bool meta = true, bool txPool = true, RpcConfig config}) async {
     try {
-      Map<dynamic, dynamic> resp = await _methodChannel.invokeMethod('getSubscribers', {
+      Map resp = await _methodChannel.invokeMethod('getSubscribers', {
         'topic': topic,
         'offset': offset,
         'limit': limit,
@@ -139,7 +143,10 @@ class Wallet {
         'txPool': txPool,
         'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
       });
-      return resp;
+      if (resp == null) {
+        return null;
+      }
+      return Map<String, dynamic>.from(resp);
     } catch (e) {
       throw e;
     }

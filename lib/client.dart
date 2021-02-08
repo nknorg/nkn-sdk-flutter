@@ -217,20 +217,23 @@ class Client {
     }
   }
 
-  Future<Map<dynamic, dynamic>> getSubscription({String topic, String subscriber}) async {
+  Future<Map<String, dynamic>> getSubscription({String topic, String subscriber}) async {
     try {
-      Map<dynamic, dynamic> resp = await _methodChannel.invokeMethod('getSubscription', {
+      Map resp = await _methodChannel.invokeMethod('getSubscription', {
         '_id': this.address,
         'topic': topic,
         'subscriber': subscriber,
       });
-      return resp;
+      if (resp == null) {
+        return null;
+      }
+      return Map<String, dynamic>.from(resp);
     } catch (e) {
       throw e;
     }
   }
 
-  Future<Map<dynamic, dynamic>> getSubscribers({
+  Future<Map<String, dynamic>> getSubscribers({
     String topic,
     int offset = 0,
     int limit = 10000,
@@ -238,7 +241,7 @@ class Client {
     bool txPool = true,
   }) async {
     try {
-      Map<dynamic, dynamic> resp = await _methodChannel.invokeMethod('getSubscribers', {
+      Map resp = await _methodChannel.invokeMethod('getSubscribers', {
         '_id': this.address,
         'topic': topic,
         'offset': offset,
@@ -246,7 +249,10 @@ class Client {
         'meta': meta,
         'txPool': txPool,
       });
-      return resp;
+      if (resp == null) {
+        return null;
+      }
+      return Map<String, dynamic>.from(resp);
     } catch (e) {
       throw e;
     }

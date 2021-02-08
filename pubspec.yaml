@@ -1,8 +1,8 @@
 name: nkn_sdk_flutter
-description: nkn-sdk-flutter
+description: Flutter implementaion of NKN client and wallet SDK.
 version: 0.0.1
-author: heron
-homepage: https://github.com/iheron/nkn-sdk-flutter
+homepage: https://github.com/nknorg/nkn-sdk-flutter
+repository: https://github.com/nknorg/nkn-sdk-flutter
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

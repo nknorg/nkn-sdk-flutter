@@ -101,7 +101,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let args = call.arguments as! [String: Any]
         let address = args["address"] as? String
         let seedRpc = args["seedRpc"] as? String
-
+        
         walletQueue.async {
             var error: NSError?
             let account = NknAccount(NknRandomBytes(32, &error))
@@ -131,8 +131,10 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let address = args["address"] as? String
         let amount = args["amount"] as? String
         let fee = args["fee"] as! String
+        let nonce = args["nonce"] as? Int64
+        let attributes = args["attributes"] as? FlutterStandardTypedData
         let seedRpc = args["seedRpc"] as? String
-
+        
         walletQueue.async {
             var error: NSError?
             let account:NknAccount? = NknNewAccount(seed?.data, &error)
@@ -152,6 +154,13 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             
             let transactionConfig: NknTransactionConfig = NknTransactionConfig()
             transactionConfig.fee = fee
+            if (nonce != nil) {
+                transactionConfig.nonce = nonce!
+            }
+            if(attributes != nil){
+                transactionConfig.attributes = attributes?.data
+            }
+            
             let hash = wallet?.transfer(address, amount: amount, config: transactionConfig, error: &error)
             if (error != nil) {
                 self.resultError(result: result, error: error)

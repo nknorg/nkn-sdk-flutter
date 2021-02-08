@@ -58,8 +58,8 @@ class _MyAppState extends State<MyApp> {
               Wrap(
                 children: [
                   FlatButton(
-                    onPressed: ()async {
-                      Wallet wallet = await Wallet.create(null, '123');
+                    onPressed: () async {
+                      Wallet wallet = await Wallet.create(null, config: WalletConfig(password: '123'));
                       print(wallet.address);
                       print(wallet.seed);
                       print(wallet.publicKey);
@@ -68,8 +68,10 @@ class _MyAppState extends State<MyApp> {
                     child: Text('create'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
-                      Wallet wallet = await Wallet.restore('{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}', '123');
+                    onPressed: () async {
+                      Wallet wallet = await Wallet.restore(
+                          '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
+                          config: WalletConfig(password: '123'));
                       print(wallet.address);
                       print(wallet.seed);
                       print(wallet.publicKey);
@@ -78,24 +80,27 @@ class _MyAppState extends State<MyApp> {
                     child: Text('restore'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
-                      Wallet wallet = await Wallet.restore('{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}', '123');
+                    onPressed: () async {
+                      Wallet wallet = await Wallet.restore(
+                          '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
+                          config: WalletConfig(password: '123'));
                       print(await wallet.getBalance());
                     },
                     child: Text('getBalance'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
-                      Wallet wallet = await Wallet.restore('{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}', '123');
+                    onPressed: () async {
+                      Wallet wallet = await Wallet.restore(
+                          '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
+                          config: WalletConfig(password: '123'));
                       print(await wallet.getBalance());
-                      String hash = await wallet.transfer('NKNVCZYpUk94xe3p3miNGSoQnkidQUfPMQxx', '0.01');
+                      String hash = await wallet.transfer(wallet.address, '0');
                       print(hash);
                     },
                     child: Text('transfer'),
                   ),
                 ],
               ),
-
               Text(
                 'Client1',
                 style: TextStyle(fontSize: 16),
@@ -103,8 +108,10 @@ class _MyAppState extends State<MyApp> {
               Wrap(
                 children: [
                   FlatButton(
-                    onPressed: ()async {
-                      Wallet wallet = await Wallet.restore('{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}', '123');
+                    onPressed: () async {
+                      Wallet wallet = await Wallet.restore(
+                          '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
+                          config: WalletConfig(password: '123'));
                       await _client1?.close();
                       _client1 = await Client.create(wallet.seed);
                       _client1.onConnect.listen((event) {
@@ -119,56 +126,52 @@ class _MyAppState extends State<MyApp> {
                         print(event.data);
                         print(event.src);
                       });
-
                     },
                     child: Text('create'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
+                    onPressed: () async {
                       _client1.close();
                     },
                     child: Text('close'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
-                      var res = await _client1.sendText([_client2.address], jsonEncode({
-                        'contentType': 'text',
-                        'content': 'hi'
-                      }));
+                    onPressed: () async {
+                      var res = await _client1.sendText([_client2.address], jsonEncode({'contentType': 'text', 'content': 'hi'}));
                       print(res);
                     },
                     child: Text('sendText'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
+                    onPressed: () async {
                       var res = await _client1.subscribe(topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('subscribe'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
+                    onPressed: () async {
                       var res = await _client1.unsubscribe(topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('unsubscribe'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
+                    onPressed: () async {
                       var res = await _client1.getSubscribersCount(topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('getSubscribersCount'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
+                    onPressed: () async {
                       var res = await _client1.getSubscription(topic: genChannelId('ttest'), subscriber: _client1.address);
                       print(res);
                     },
                     child: Text('getSubscription'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
+                    onPressed: () async {
                       var res = await _client1.getSubscribers(topic: genChannelId('ttest'));
                       print(res);
                     },
@@ -183,7 +186,7 @@ class _MyAppState extends State<MyApp> {
               Wrap(
                 children: [
                   FlatButton(
-                    onPressed: ()async {
+                    onPressed: () async {
                       await _client2?.close();
                       _client2 = await Client.create(hexDecode('bd8bd3de4dd0f798fac5a0a56e536a8bacd5b7f46d0951d8665fd68d0a910996'));
                       _client2.onConnect.listen((event) {
@@ -198,22 +201,18 @@ class _MyAppState extends State<MyApp> {
                         print(event.data);
                         print(event.src);
                       });
-
                     },
                     child: Text('create'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
+                    onPressed: () async {
                       _client2.close();
                     },
                     child: Text('close'),
                   ),
                   FlatButton(
-                    onPressed: ()async {
-                      var res = await _client2.sendText([_client1.address], jsonEncode({
-                        'contentType': 'text',
-                        'content': 'hi2'
-                      }));
+                    onPressed: () async {
+                      var res = await _client2.sendText([_client1.address], jsonEncode({'contentType': 'text', 'content': 'hi2'}));
                       print(res);
                     },
                     child: Text('sendText'),

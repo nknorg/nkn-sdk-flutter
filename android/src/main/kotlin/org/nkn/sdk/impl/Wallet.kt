@@ -12,7 +12,8 @@ import nkn.*
 import org.nkn.sdk.IChannelHandler
 import org.bouncycastle.util.encoders.Hex
 
-class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, ViewModel() {
+class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler,
+    ViewModel() {
     companion object {
         val CHANNEL_NAME = "org.nkn.sdk/wallet"
     }
@@ -79,10 +80,10 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val wallet = Nkn.newWallet(account, config)
         val json = wallet.toJSON()
         val resp = hashMapOf(
-                "address" to wallet.address(),
-                "keystore" to json,
-                "publicKey" to wallet.pubKey(),
-                "seed" to wallet.seed()
+            "address" to wallet.address(),
+            "keystore" to json,
+            "publicKey" to wallet.pubKey(),
+            "seed" to wallet.seed()
         )
         result.success(resp)
     }
@@ -100,10 +101,10 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             val wallet = Nkn.walletFromJSON(keystore, config)
             val json = wallet?.toJSON()
             val resp = hashMapOf(
-                    "address" to wallet.address(),
-                    "keystore" to json,
-                    "publicKey" to wallet.pubKey(),
-                    "seed" to wallet.seed()
+                "address" to wallet.address(),
+                "keystore" to json,
+                "publicKey" to wallet.pubKey(),
+                "seed" to wallet.seed()
             )
             result.success(resp)
         } catch (e: Throwable) {
@@ -148,6 +149,8 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val address = call.argument<String>("address")
         val amount = call.argument<String>("amount") ?: "0"
         val fee = call.argument<String>("fee") ?: "0"
+        val nonce = call.argument<Long>("nonce")
+        val attributes = call.argument<ByteArray>("attributes")
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
         val config = WalletConfig()
         if (seedRpc != null) {
@@ -162,6 +165,13 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 val wallet = Nkn.newWallet(account, config)
                 val transactionConfig = TransactionConfig()
                 transactionConfig.fee = fee
+                if (nonce != null) {
+                    transactionConfig.nonce = nonce
+                }
+                if (attributes != null) {
+                    transactionConfig.attributes = attributes
+                }
+
                 val hash = wallet.transfer(address, amount, transactionConfig)
                 resultSuccess(result, hash)
                 return@launch
@@ -189,7 +199,8 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                         config.seedRPCServerAddr.append(addr)
                     }
                 }
-                val subscribers = Nkn.getSubscribers(topic, offset.toLong(), limit.toLong(), meta, txPool, config)
+                val subscribers =
+                    Nkn.getSubscribers(topic, offset.toLong(), limit.toLong(), meta, txPool, config)
 
                 val resp = hashMapOf<String, String>()
 
@@ -223,8 +234,8 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 }
                 val subscription = Nkn.getSubscription(topic, subscriber, config)
                 val resp = hashMapOf(
-                        "meta" to subscription.meta,
-                        "expiresAt" to subscription.expiresAt
+                    "meta" to subscription.meta,
+                    "expiresAt" to subscription.expiresAt
                 )
                 resultSuccess(result, resp)
                 return@launch
