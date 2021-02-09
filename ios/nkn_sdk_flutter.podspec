@@ -4,12 +4,12 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'nkn_sdk_flutter'
-  s.version          = '0.0.1'
+  s.version          = '0.0.2'
   s.summary          = 'nkn-sdk-flutter'
   s.description      = <<-DESC
 nkn-sdk-flutter
                        DESC
-  s.homepage         = 'https://github.com/iheron/nkn-sdk-flutter'
+  s.homepage         = 'https://github.com/nknorg/nkn-sdk-flutter'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Heron' => 'heron.roman@gmail.com' }
   s.source           = { :path => '.' }

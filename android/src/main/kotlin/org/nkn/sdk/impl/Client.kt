@@ -164,7 +164,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             val data = hashMapOf(
                     "address" to client.address(),
                     "publicKey" to client.pubKey(),
-                    "seed" to client.seed(),
+                    "seed" to client.seed()
             )
             resultSuccess(result, data)
             onConnect(client)

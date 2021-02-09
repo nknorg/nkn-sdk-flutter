@@ -59,7 +59,8 @@ class _MyAppState extends State<MyApp> {
                 children: [
                   FlatButton(
                     onPressed: () async {
-                      Wallet wallet = await Wallet.create(null, config: WalletConfig(password: '123'));
+                      Wallet wallet = await Wallet.create(null,
+                          config: WalletConfig(password: '123'));
                       print(wallet.address);
                       print(wallet.seed);
                       print(wallet.publicKey);
@@ -137,42 +138,49 @@ class _MyAppState extends State<MyApp> {
                   ),
                   FlatButton(
                     onPressed: () async {
-                      var res = await _client1.sendText([_client2.address], jsonEncode({'contentType': 'text', 'content': 'hi'}));
+                      var res = await _client1.sendText([_client2.address],
+                          jsonEncode({'contentType': 'text', 'content': 'hi'}));
                       print(res);
                     },
                     child: Text('sendText'),
                   ),
                   FlatButton(
                     onPressed: () async {
-                      var res = await _client1.subscribe(topic: genChannelId('ttest'));
+                      var res = await _client1.subscribe(
+                          topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('subscribe'),
                   ),
                   FlatButton(
                     onPressed: () async {
-                      var res = await _client1.unsubscribe(topic: genChannelId('ttest'));
+                      var res = await _client1.unsubscribe(
+                          topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('unsubscribe'),
                   ),
                   FlatButton(
                     onPressed: () async {
-                      var res = await _client1.getSubscribersCount(topic: genChannelId('ttest'));
+                      var res = await _client1.getSubscribersCount(
+                          topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('getSubscribersCount'),
                   ),
                   FlatButton(
                     onPressed: () async {
-                      var res = await _client1.getSubscription(topic: genChannelId('ttest'), subscriber: _client1.address);
+                      var res = await _client1.getSubscription(
+                          topic: genChannelId('ttest'),
+                          subscriber: _client1.address);
                       print(res);
                     },
                     child: Text('getSubscription'),
                   ),
                   FlatButton(
                     onPressed: () async {
-                      var res = await _client1.getSubscribers(topic: genChannelId('ttest'));
+                      var res = await _client1.getSubscribers(
+                          topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('getSubscribers'),
@@ -188,7 +196,8 @@ class _MyAppState extends State<MyApp> {
                   FlatButton(
                     onPressed: () async {
                       await _client2?.close();
-                      _client2 = await Client.create(hexDecode('bd8bd3de4dd0f798fac5a0a56e536a8bacd5b7f46d0951d8665fd68d0a910996'));
+                      _client2 = await Client.create(hexDecode(
+                          'bd8bd3de4dd0f798fac5a0a56e536a8bacd5b7f46d0951d8665fd68d0a910996'));
                       _client2.onConnect.listen((event) {
                         print('------onConnect2-----');
                         print(event.node);
@@ -212,7 +221,9 @@ class _MyAppState extends State<MyApp> {
                   ),
                   FlatButton(
                     onPressed: () async {
-                      var res = await _client2.sendText([_client1.address], jsonEncode({'contentType': 'text', 'content': 'hi2'}));
+                      var res = await _client2.sendText([
+                        _client1.address
+                      ], jsonEncode({'contentType': 'text', 'content': 'hi2'}));
                       print(res);
                     },
                     child: Text('sendText'),

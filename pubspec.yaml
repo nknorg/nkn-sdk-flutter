@@ -1,6 +1,6 @@
 name: nkn_sdk_flutter
-description: Flutter implementaion of NKN client and wallet SDK.
-version: 0.0.1
+description: Flutter implementaion of NKN client and wallet SDK. Send and receive data for free between any NKN clients regardless their network condition without setting up a server or relying on any third party services. Data are end to end encrypted by default. Typically you might want to use multiclient instead of using client directly.
+version: 0.0.2
 homepage: https://github.com/nknorg/nkn-sdk-flutter
 repository: https://github.com/nknorg/nkn-sdk-flutter
 
@@ -11,8 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  crypto: ^2.1.5
-  convert: ^2.1.1
+  crypto: ^3.0.0
+  convert: ^3.0.0
   logger: ^0.9.4
 
 dev_dependencies:
