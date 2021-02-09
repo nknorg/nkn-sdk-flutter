@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'nkn_sdk_flutter'
-  s.version          = '0.0.2'
+  s.version          = '0.0.4'
   s.summary          = 'nkn-sdk-flutter'
   s.description      = <<-DESC
 nkn-sdk-flutter
