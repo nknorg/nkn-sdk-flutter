@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - nkn_sdk_flutter (0.0.1):
+  - nkn_sdk_flutter (0.0.4):
     - Flutter
 
 DEPENDENCIES:
@@ -15,8 +15,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  nkn_sdk_flutter: e9d57f6f9ab6a6a20286fa6f2d35c8ce4f3d2c38
+  nkn_sdk_flutter: 474f0ff5cf11795bd592708a1c707cc15e70e49a
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.10.1

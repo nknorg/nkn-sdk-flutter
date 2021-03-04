@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Fix ios seed rpc parameters
+
 ## 0.0.4
 
 * Clean dart code

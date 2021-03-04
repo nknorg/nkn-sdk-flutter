@@ -133,7 +133,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let fee = args["fee"] as! String
         let nonce = args["nonce"] as? Int64
         let attributes = args["attributes"] as? FlutterStandardTypedData
-        let seedRpc = args["seedRpc"] as? String
+        let seedRpc = args["seedRpc"] as? [String]
         
         walletQueue.async {
             var error: NSError?
@@ -144,7 +144,10 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             }
             let config = NknWalletConfig()
             if(seedRpc != nil) {
-                config.seedRPCServerAddr = NknStringArray(from: seedRpc)
+                config.seedRPCServerAddr = NknStringArray(from: nil)
+                for (_, v) in seedRpc!.enumerated() {
+                    config.seedRPCServerAddr?.append(v)
+                }
             }
             let wallet = NknNewWallet(account, config, &error)
             if (error != nil) {
