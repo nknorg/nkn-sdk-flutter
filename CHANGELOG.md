@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Update flutter sdk and dependencies version
+
 ## 0.0.5
 
 * Fix ios seed rpc parameters
