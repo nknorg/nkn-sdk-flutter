@@ -1,3 +1,7 @@
+## 0.0.7
+
+* Fix client create failure handling 
+
 ## 0.0.6
 
 * Update flutter sdk and dependencies version

@@ -73,10 +73,10 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         try {
             val node = client.onConnect.next()
             val resp = hashMapOf(
-                    "_id" to client.address(),
-                    "event" to "onConnect",
-                    "node" to hashMapOf("address" to node.addr, "publicKey" to node.pubKey),
-                    "client" to hashMapOf("address" to client.address())
+                "_id" to client.address(),
+                "event" to "onConnect",
+                "node" to hashMapOf("address" to node.addr, "publicKey" to node.pubKey),
+                "client" to hashMapOf("address" to client.address())
             )
             Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
             eventSinkSuccess(eventSink, resp)
@@ -89,15 +89,15 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         try {
             val msg = client.onMessage.next() ?: return
             val resp = hashMapOf(
-                    "_id" to client.address(),
-                    "event" to "onMessage",
-                    "data" to hashMapOf(
-                            "src" to msg.src,
-                            "data" to String(msg.data, Charsets.UTF_8),
-                            "type" to msg.type,
-                            "encrypted" to msg.encrypted,
-                            "messageId" to msg.messageID
-                    )
+                "_id" to client.address(),
+                "event" to "onMessage",
+                "data" to hashMapOf(
+                    "src" to msg.src,
+                    "data" to String(msg.data, Charsets.UTF_8),
+                    "type" to msg.type,
+                    "encrypted" to msg.encrypted,
+                    "messageId" to msg.messageID
+                )
             )
             Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
             eventSinkSuccess(eventSink, resp)
@@ -160,15 +160,19 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val account = Nkn.newAccount(seed)
 
         viewModelScope.launch(Dispatchers.IO) {
-            val client = createClient(account, identifier, config)
-            val data = hashMapOf(
+            try {
+                val client = createClient(account, identifier, config)
+                val data = hashMapOf(
                     "address" to client.address(),
                     "publicKey" to client.pubKey(),
                     "seed" to client.seed()
-            )
-            resultSuccess(result, data)
-            onConnect(client)
-            async(Dispatchers.IO) { onMessage(client) }
+                )
+                resultSuccess(result, data)
+                onConnect(client)
+                async(Dispatchers.IO) { onMessage(client) }
+            } catch (e: Throwable) {
+                resultError(result, "", e.localizedMessage)
+            }
         }
     }
 
@@ -222,18 +226,18 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                         return@launch
                     }
                     val resp = hashMapOf(
-                            "src" to msg.src,
-                            "data" to String(msg.data, Charsets.UTF_8),
-                            "type" to msg.type,
-                            "encrypted" to msg.encrypted,
-                            "messageId" to msg.messageID
+                        "src" to msg.src,
+                        "data" to String(msg.data, Charsets.UTF_8),
+                        "type" to msg.type,
+                        "encrypted" to msg.encrypted,
+                        "messageId" to msg.messageID
                     )
                     resultSuccess(result, resp)
                     return@launch
                 } else {
                     client?.sendText(nknDests, data, config)
                     val resp = hashMapOf(
-                            "messageId" to config.messageID
+                        "messageId" to config.messageID
                     )
                     resultSuccess(result, resp)
                     return@launch
@@ -265,7 +269,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             try {
                 client?.publishText(topic, data, config)
                 val resp = hashMapOf(
-                        "messageId" to config.messageID
+                    "messageId" to config.messageID
                 )
                 resultSuccess(result, resp)
                 return@launch
@@ -382,8 +386,8 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             try {
                 val subscription = client!!.getSubscription(topic, subscriber)
                 val resp = hashMapOf(
-                        "meta" to subscription.meta,
-                        "expiresAt" to subscription.expiresAt
+                    "meta" to subscription.meta,
+                    "expiresAt" to subscription.expiresAt
                 )
                 resultSuccess(result, resp)
                 return@launch

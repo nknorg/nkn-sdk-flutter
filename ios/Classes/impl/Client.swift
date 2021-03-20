@@ -42,7 +42,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         return FlutterError(code: code ?? "", message: error?.localizedDescription, details: "")
     }
     
-    private func createClient(account: NknAccount, identifier: String = "", config: NknClientConfig) -> NknMultiClient {
+    private func createClient(account: NknAccount, identifier: String = "", config: NknClientConfig) -> NknMultiClient? {
         let pubKey: String = account.pubKey()!.hexEncode
         let id = identifier.isEmpty ? pubKey : "\(identifier).\(pubKey)"
         
@@ -50,6 +50,9 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             closeClient(id: id)
         }
         let client = NknMultiClient(account, baseIdentifier: identifier, numSubClients: 3, originalClient: true, config: config)
+        if (client == nil) {
+            return nil
+        }
         clientMap[client!.address()] = client
         return client!
     }
@@ -72,6 +75,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
         
         var resp: [String: Any] = [String: Any]()
+        resp["_id"] = client.address()
         resp["event"] = "onConnect"
         resp["node"] = ["address": node.addr, "publicKey": node.pubKey]
         resp["client"] = ["address": client.address()]
@@ -144,7 +148,12 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 self.resultError(result: result, error: error)
                 return
             }
-            let client = self.createClient(account: account, identifier: identifier, config: config)
+
+            guard let client = self.createClient(account: account, identifier: identifier, config: config) else {
+                self.resultError(result: result, code: "", message: "connect fail")
+                return
+            }
+
             var resp:[String:Any] = [String:Any]()
             resp["address"] = client.address()
             resp["publicKey"] = client.pubKey()
