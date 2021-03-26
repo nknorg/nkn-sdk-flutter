@@ -96,7 +96,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             "data": String(data: msg.data!, encoding: String.Encoding.utf8)!,
             "type": msg.type,
             "encrypted": msg.encrypted,
-            "messageId": FlutterStandardTypedData(bytes: msg.messageID!)
+            "messageId": msg.messageID != nil ? FlutterStandardTypedData(bytes: msg.messageID!) : nil
         ]
         NSLog("%@", resp)
         self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
@@ -216,7 +216,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                     resp["data"] = String(data: msg.data!, encoding: String.Encoding.utf8)!
                     resp["type"] = msg.type
                     resp["encrypted"] = msg.encrypted
-                    resp["messageId"] = FlutterStandardTypedData(bytes: msg.messageID!)
+                    resp["messageId"] = msg.messageID != nil ? FlutterStandardTypedData(bytes: msg.messageID!) : nil
                     self.resultSuccess(result: result, resp: resp)
                     return
                 } else {

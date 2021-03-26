@@ -1,3 +1,7 @@
+## 0.0.8
+
+* Fix ios receive message when messageId is null
+
 ## 0.0.7
 
 * Fix client create failure handling 
