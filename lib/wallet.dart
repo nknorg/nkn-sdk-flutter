@@ -91,6 +91,7 @@ class Wallet {
         'address': address,
         'amount': amount,
         'fee': fee,
+        'nonce': nonce,
         'attributes': attributes,
         'seedRpc': this.walletConfig?.seedRPCServerAddr,
       });
