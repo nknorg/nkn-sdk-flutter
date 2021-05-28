@@ -1,3 +1,7 @@
+## 0.1.1
+
+* Fix wallet params
+
 ## 0.1.0
 
 * Update to null-safe versions

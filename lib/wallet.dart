@@ -30,7 +30,7 @@ class Wallet {
 
   Wallet({required this.walletConfig});
 
-  static Future<Wallet> create(Uint8List seed, {required WalletConfig config}) async {
+  static Future<Wallet> create(Uint8List? seed, {required WalletConfig config}) async {
     try {
       final Map data = await _methodChannel.invokeMethod('create', {
         'seed': seed,
@@ -64,11 +64,11 @@ class Wallet {
     }
   }
 
-  static Future<double> getBalanceByAddr(String address, {required WalletConfig config}) async {
+  static Future<double> getBalanceByAddr(String address, {WalletConfig? config}) async {
     try {
       return await _methodChannel.invokeMethod('getBalance', {
         'address': address,
-        'seedRpc': config.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : null,
+        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config?.seedRPCServerAddr : null,
       });
     } catch (e) {
       throw e;
