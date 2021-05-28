@@ -3,9 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:nkn_sdk_flutter/client.dart';
-import 'package:nkn_sdk_flutter/nkn_sdk.dart';
 import 'package:nkn_sdk_flutter/utils/hash.dart';
 import 'package:nkn_sdk_flutter/utils/hex.dart';
 import 'package:nkn_sdk_flutter/wallet.dart';
@@ -57,7 +55,7 @@ class _MyAppState extends State<MyApp> {
               ),
               Wrap(
                 children: [
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       Wallet wallet = await Wallet.create(null,
                           config: WalletConfig(password: '123'));
@@ -68,7 +66,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('create'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       Wallet wallet = await Wallet.restore(
                           '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
@@ -80,7 +78,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('restore'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       Wallet wallet = await Wallet.restore(
                           '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
@@ -89,7 +87,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('getBalance'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       Wallet wallet = await Wallet.restore(
                           '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
@@ -108,7 +106,7 @@ class _MyAppState extends State<MyApp> {
               ),
               Wrap(
                 children: [
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       Wallet wallet = await Wallet.restore(
                           '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
@@ -130,13 +128,13 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('create'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       _client1.close();
                     },
                     child: Text('close'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       var res = await _client1.sendText([_client2.address],
                           jsonEncode({'contentType': 'text', 'content': 'hi'}));
@@ -144,7 +142,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('sendText'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       var res = await _client1.subscribe(
                           topic: genChannelId('ttest'));
@@ -152,7 +150,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('subscribe'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       var res = await _client1.unsubscribe(
                           topic: genChannelId('ttest'));
@@ -160,7 +158,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('unsubscribe'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       var res = await _client1.getSubscribersCount(
                           topic: genChannelId('ttest'));
@@ -168,7 +166,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('getSubscribersCount'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       var res = await _client1.getSubscription(
                           topic: genChannelId('ttest'),
@@ -177,7 +175,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('getSubscription'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       var res = await _client1.getSubscribers(
                           topic: genChannelId('ttest'));
@@ -193,7 +191,7 @@ class _MyAppState extends State<MyApp> {
               ),
               Wrap(
                 children: [
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       await _client2?.close();
                       _client2 = await Client.create(hexDecode(
@@ -213,13 +211,13 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('create'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       _client2.close();
                     },
                     child: Text('close'),
                   ),
-                  FlatButton(
+                  TextButton(
                     onPressed: () async {
                       var res = await _client2.sendText([
                         _client1.address
