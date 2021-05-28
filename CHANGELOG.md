@@ -1,3 +1,7 @@
+## 0.0.14
+
+* Add OnConnect filed rpcServers
+
 ## 0.0.13
 
 * Create client, on connect add rpcServers 
