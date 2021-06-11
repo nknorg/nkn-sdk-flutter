@@ -1,3 +1,7 @@
+## 0.1.4
+
+* Update WalletConfig
+
 ## 0.1.3
 
 * Fix send message noreply return null value
