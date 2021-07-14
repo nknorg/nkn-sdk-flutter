@@ -137,6 +137,10 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             getSubscribers(call, result: result)
         case "getSubscription":
             getSubscription(call, result: result)
+        case "getHeight":
+            getHeight(call, result: result)
+        case "getNonce":
+            getNonce(call, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -424,6 +428,58 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 resp["meta"] = res.meta
                 resp["expiresAt"] = res.expiresAt
                 self.resultSuccess(result: result, resp: resp)
+                return
+            } catch let error {
+                self.resultError(result: result, error: error, code: _id)
+                return
+            }
+        }
+    }
+    
+    private func getHeight(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let _id = args["_id"] as! String
+
+        guard (clientMap.keys.contains(_id)) else {
+            result(FlutterError(code: "", message: "client is null", details: ""))
+            return
+        }
+        guard let client = clientMap[_id] else{
+            return
+        }
+
+        clientTransferQueue.async {
+            do {
+                var height: Int32 = 0
+                try client.getHeight(&height)
+                self.resultSuccess(result: result, resp: height)
+                return
+            } catch let error {
+                self.resultError(result: result, error: error, code: _id)
+                return
+            }
+        }
+    }
+    
+    private func getNonce(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let _id = args["_id"] as! String
+        let address = args["address"] as! String
+        let txPool = args["txPool"] as? Bool ?? true
+
+        guard (clientMap.keys.contains(_id)) else {
+            result(FlutterError(code: "", message: "client is null", details: ""))
+            return
+        }
+        guard let client = clientMap[_id] else{
+            return
+        }
+
+        clientTransferQueue.async {
+            do {
+                var nonce: Int64 = 0
+                try client.getNonceByAddress(address, txPool: txPool, ret0_: &nonce)
+                self.resultSuccess(result: result, resp: nonce)
                 return
             } catch let error {
                 self.resultError(result: result, error: error, code: _id)

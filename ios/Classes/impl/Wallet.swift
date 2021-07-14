@@ -43,6 +43,10 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             getSubscribers(call, result: result)
         case "getSubscription":
             getSubscription(call, result: result)
+        case "getHeight":
+            getHeight(call, result: result)
+        case "getNonce":
+            getNonce(call, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -268,6 +272,58 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             resp["expiresAt"] = res?.expiresAt
             self.resultSuccess(result: result, resp: resp)
             return
+        }
+    }
+    
+    private func getHeight(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let seedRpc = args["seedRpc"] as? [String]
+
+        walletQueue.async {
+            let config = NknWalletConfig()
+            if(seedRpc != nil) {
+                config.seedRPCServerAddr = NknStringArray(from: nil)
+                for (_, v) in seedRpc!.enumerated() {
+                    config.seedRPCServerAddr?.append(v)
+                }
+            }
+            var height: Int32 = 0
+            var error: NSError?
+            NknGetHeight(config, &height, &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+            self.resultSuccess(result: result, resp: height)
+            return
+
+        }
+    }
+    
+    private func getNonce(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let address = args["address"] as! String
+        let txPool = args["txPool"] as? Bool ?? true
+        let seedRpc = args["seedRpc"] as? [String]
+
+        walletQueue.async {
+            let config = NknWalletConfig()
+            if(seedRpc != nil) {
+                config.seedRPCServerAddr = NknStringArray(from: nil)
+                for (_, v) in seedRpc!.enumerated() {
+                    config.seedRPCServerAddr?.append(v)
+                }
+            }
+            var nonce: Int64 = 0
+            var error: NSError?
+            NknGetNonce(address, txPool, config, &nonce, &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+            self.resultSuccess(result: result, resp: nonce)
+            return
+
         }
     }
 }

@@ -98,6 +98,30 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('transfer'),
                   ),
+                  TextButton(
+                    onPressed: () async {
+                      Wallet wallet = await Wallet.restore(
+                          '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
+                          config: WalletConfig(password: '123'));
+                      int nonce = await wallet.getNonce();
+                      print(nonce);
+                    },
+                    child: Text('getNonce'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      int height = await Wallet.getHeight();
+                      print(height);
+                    },
+                    child: Text('getHeight'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      int nonce = await Wallet.getNonceByAddress('NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
+                      print(nonce);
+                    },
+                    child: Text('getNonceByAddress'),
+                  ),
                 ],
               ),
               Text(
@@ -182,6 +206,27 @@ class _MyAppState extends State<MyApp> {
                       print(res);
                     },
                     child: Text('getSubscribers'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var res = await _client1.getHeight();
+                      print(res);
+                    },
+                    child: Text('getHeight'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var res = await _client1.getNonce();
+                      print(res);
+                    },
+                    child: Text('getNonce'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      var res = await _client1.getNonceByAddress('NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
+                      print(res);
+                    },
+                    child: Text('getNonceByAddress'),
                   ),
                 ],
               ),
