@@ -157,13 +157,14 @@ class Client {
     }
   }
 
-  Future<OnMessage> publishText(String topic, String data, {int maxHoldingSeconds = 8640000}) async {
+  Future<OnMessage> publishText(String topic, String data, {int maxHoldingSeconds = 8640000, bool txPool = false}) async {
     try {
       final Map resp = await _methodChannel.invokeMethod('publishText', {
         '_id': this.address,
         'topic': topic,
         'data': data,
         'maxHoldingSeconds': maxHoldingSeconds,
+        'txPool': txPool,
       });
       OnMessage message = OnMessage(
         messageId: resp['messageId'],
@@ -272,9 +273,7 @@ class Client {
 
   Future<int?> getHeight() async {
     try {
-      int? resp = await _methodChannel.invokeMethod('getHeight', {
-        '_id': this.address
-      });
+      int? resp = await _methodChannel.invokeMethod('getHeight', {'_id': this.address});
       return resp;
     } catch (e) {
       throw e;
@@ -295,7 +294,7 @@ class Client {
     }
   }
 
-  Future<int?> getNonceByAddress(String address,{bool txPool = true}) async {
+  Future<int?> getNonceByAddress(String address, {bool txPool = true}) async {
     try {
       int? resp = await _methodChannel.invokeMethod('getNonce', {
         '_id': this.address,
