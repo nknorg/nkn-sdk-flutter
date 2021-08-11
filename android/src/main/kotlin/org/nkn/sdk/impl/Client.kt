@@ -85,6 +85,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                     }
                 }
             }
+
             val resp = hashMapOf(
                 "_id" to client.address(),
                 "event" to "onConnect",
@@ -102,6 +103,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
     private suspend fun onMessage(client: MultiClient) {
         try {
             val msg = client.onMessage.next() ?: return
+
             val resp = hashMapOf(
                 "_id" to client.address(),
                 "event" to "onMessage",
@@ -170,27 +172,27 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val seed = call.argument<ByteArray>("seed")
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
 
-        val account = Nkn.newAccount(seed)
+        val config = ClientConfig()
+        if (seedRpc != null) {
+            config.seedRPCServerAddr = StringArray(null)
+            for (addr in seedRpc) {
+                config.seedRPCServerAddr.append(addr)
+            }
+        }
+        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val config = ClientConfig()
-                if (seedRpc != null) {
-                    config.seedRPCServerAddr = StringArray(null)
-                    for (addr in seedRpc) {
-                        config.seedRPCServerAddr.append(addr)
-                    }
-                }
-                config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
-                // config.rpcConcurrency = 4
-
+                val account = Nkn.newAccount(seed)
                 val client = createClient(account, identifier, config)
+
                 val data = hashMapOf(
                     "address" to client.address(),
                     "publicKey" to client.pubKey(),
                     "seed" to client.seed()
                 )
                 resultSuccess(result, data)
+
                 onConnect(client)
                 async(Dispatchers.IO) { onMessage(client) }
             } catch (e: Throwable) {
@@ -219,7 +221,6 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         var nknDests: StringArray? = null
         for (d in dests) {
@@ -241,6 +242,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = clientMap[_id]
                 if (!noReply) {
                     val onMessage = client?.sendText(nknDests, data, config)
                     val msg = onMessage?.nextWithTimeout(timeout)
@@ -248,6 +250,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                         resultSuccess(result, null)
                         return@launch
                     }
+
                     val resp = hashMapOf(
                         "src" to msg.src,
                         "data" to String(msg.data, Charsets.UTF_8),
@@ -259,6 +262,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                     return@launch
                 } else {
                     client?.sendText(nknDests, data, config)
+
                     val resp = hashMapOf(
                         "messageId" to config.messageID
                     )
@@ -283,7 +287,6 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         val config = MessageConfig()
         config.maxHoldingSeconds = if (maxHoldingSeconds < 0) 0 else maxHoldingSeconds
@@ -292,7 +295,9 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch {
             try {
+                val client = clientMap[_id]
                 client?.publishText(topic, data, config)
+
                 val resp = hashMapOf(
                     "messageId" to config.messageID
                 )
@@ -318,14 +323,15 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         val transactionConfig = TransactionConfig()
         transactionConfig.fee = fee
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = clientMap[_id]
                 val hash = client?.subscribe(identifier, topic, duration.toLong(), meta, transactionConfig)
+
                 resultSuccess(result, hash)
                 return@launch
             } catch (e: Throwable) {
@@ -345,14 +351,15 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         val transactionConfig = TransactionConfig()
         transactionConfig.fee = fee
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = clientMap[_id]
                 val hash = client?.unsubscribe(identifier, topic, transactionConfig)
+
                 resultSuccess(result, hash)
                 return@launch
             } catch (e: Exception) {
@@ -375,10 +382,10 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = clientMap[_id]
                 val subscribers = client?.getSubscribers(topic, offset.toLong(), limit.toLong(), meta, txPool, subscriberHashPrefix)
 
                 val resp = hashMapOf<String, String>()
@@ -404,11 +411,12 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = clientMap[_id]
                 val subscription = client?.getSubscription(topic, subscriber)
+
                 val resp = hashMapOf(
                     "meta" to subscription?.meta,
                     "expiresAt" to subscription?.expiresAt
@@ -431,11 +439,12 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = clientMap[_id]
                 val count = client?.getSubscribersCount(topic, subscriberHashPrefix)
+
                 resultSuccess(result, count)
                 return@launch
             } catch (e: Exception) {
@@ -452,11 +461,12 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = clientMap[_id]
                 val height = client?.height
+
                 resultSuccess(result, height)
                 return@launch
             } catch (e: Exception) {
@@ -475,11 +485,12 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             result.error("", "client is null", "")
             return
         }
-        val client = clientMap[_id]
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val client = clientMap[_id]
                 val nonce = client?.getNonceByAddress(address, txPool)
+
                 resultSuccess(result, nonce)
                 return@launch
             } catch (e: Exception) {
