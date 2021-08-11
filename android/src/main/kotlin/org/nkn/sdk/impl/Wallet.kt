@@ -99,7 +99,7 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             "address" to wallet.address(),
             "keystore" to json,
             "publicKey" to wallet.pubKey(),
-            "seed" to wallet.seed(),
+            "seed" to wallet.seed()
         )
         result.success(resp)
     }
@@ -131,7 +131,7 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 "address" to wallet.address(),
                 "keystore" to json,
                 "publicKey" to wallet.pubKey(),
-                "seed" to wallet.seed(),
+                "seed" to wallet.seed()
             )
             result.success(resp)
         } catch (e: Throwable) {
@@ -272,7 +272,7 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 val subscription = Nkn.getSubscription(topic, subscriber, config)
                 val resp = hashMapOf(
                     "meta" to subscription.meta,
-                    "expiresAt" to subscription.expiresAt,
+                    "expiresAt" to subscription.expiresAt
                 )
                 resultSuccess(result, resp)
                 return@launch
