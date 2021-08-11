@@ -39,6 +39,9 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            "measureSeedRPCServer" -> {
+                measureSeedRPCServer(call, result)
+            }
             "create" -> {
                 create(call, result)
             }
@@ -72,6 +75,39 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             else -> {
                 result.notImplemented()
             }
+        }
+    }
+
+    private fun measureSeedRPCServer(call: MethodCall, result: MethodChannel.Result) {
+        val seedRpc = call.argument<ArrayList<String>?>("seedRpc") ?: arrayListOf()
+
+        var seedRPCServerAddr = StringArray(null)
+        for (addr in seedRpc) {
+            seedRPCServerAddr.append(addr)
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                seedRPCServerAddr = Nkn.measureSeedRPCServer(seedRPCServerAddr, 1500)
+
+                val seedRPCServerAddrs = arrayListOf<String>()
+                val elements = seedRPCServerAddr.elemsString().split(",")
+                for (element in elements) {
+                    if (element.isNotEmpty()) {
+                        seedRPCServerAddrs.add(element)
+                    }
+                }
+
+                val resp = hashMapOf(
+                    "seedRPCServerAddrList" to seedRPCServerAddrs
+                )
+                resultSuccess(result, resp)
+                return@launch
+            } catch (e: Throwable) {
+                resultError(result, e)
+                return@launch
+            }
+
         }
     }
 
