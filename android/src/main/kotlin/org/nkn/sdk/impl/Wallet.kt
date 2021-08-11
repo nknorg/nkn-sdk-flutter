@@ -88,26 +88,29 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
         // config.rpcConcurrency = 4
 
-        val account = Nkn.newAccount(seed)
-        val wallet = Nkn.newWallet(account, config)
+        try {
+            val account = Nkn.newAccount(seed)
+            val wallet = Nkn.newWallet(account, config)
 
-        val json = wallet.toJSON()
-        val resp = hashMapOf(
-            "address" to wallet.address(),
-            "keystore" to json,
-            "publicKey" to wallet.pubKey(),
-            "seed" to wallet.seed()
-        )
-        result.success(resp)
+            val resp = hashMapOf(
+                "address" to wallet.address(),
+                "keystore" to wallet.toJSON(),
+                "publicKey" to wallet.pubKey(),
+                "seed" to wallet.seed()
+            )
+            result.success(resp)
+        } catch (e: Throwable) {
+            result.error("", e.localizedMessage, e.message)
+        }
     }
 
     private fun restore(call: MethodCall, result: MethodChannel.Result) {
         val keystore = call.argument<String>("keystore")
         val password = call.argument<String>("password") ?: ""
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
+
         if (keystore == null) {
             result.success(null)
             return
@@ -121,15 +124,14 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
         // config.rpcConcurrency = 4
 
         try {
             val wallet = Nkn.walletFromJSON(keystore, config)
-            val json = wallet?.toJSON()
+
             val resp = hashMapOf(
                 "address" to wallet.address(),
-                "keystore" to json,
+                "keystore" to wallet?.toJSON(),
                 "publicKey" to wallet.pubKey(),
                 "seed" to wallet.seed()
             )
@@ -158,13 +160,13 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
         // config.rpcConcurrency = 4
 
-        val wallet = Nkn.newWallet(account, config)
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val wallet = Nkn.newWallet(account, config)
                 val balance = wallet.balanceByAddress(address).toString()
+
                 resultSuccess(result, balance.toDouble())
                 return@launch
             } catch (e: Throwable) {
@@ -190,7 +192,6 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
         // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -205,8 +206,8 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 if (attributes != null) {
                     transactionConfig.attributes = attributes
                 }
-
                 val hash = wallet.transfer(address, amount, transactionConfig)
+
                 resultSuccess(result, hash)
                 return@launch
             } catch (e: Throwable) {
@@ -225,24 +226,24 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
         val subscriberHashPrefix = call.argument<ByteArray>("subscriberHashPrefix")
 
+        val config = RPCConfig()
+        if (seedRpc != null) {
+            config.seedRPCServerAddr = StringArray(null)
+            for (addr in seedRpc) {
+                config.seedRPCServerAddr.append(addr)
+            }
+        }
+        // config.rpcConcurrency = 4
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val config = RPCConfig()
-                if (seedRpc != null) {
-                    config.seedRPCServerAddr = StringArray(null)
-                    for (addr in seedRpc) {
-                        config.seedRPCServerAddr.append(addr)
-                    }
-                }
-                config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
-                // config.rpcConcurrency = 4
-
                 val subscribers = Nkn.getSubscribers(topic, offset.toLong(), limit.toLong(), meta, txPool, subscriberHashPrefix, config)
                 val resp = hashMapOf<String, String>()
                 subscribers.subscribers.range { addr, value ->
                     resp[addr] = value?.trim() ?: ""
                     true
                 }
+
                 resultSuccess(result, resp)
                 return@launch
             } catch (e: Exception) {
@@ -257,23 +258,23 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val subscriber = call.argument<String>("subscriber")!!
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
 
+        val config = RPCConfig()
+        if (seedRpc != null) {
+            config.seedRPCServerAddr = StringArray(null)
+            for (addr in seedRpc) {
+                config.seedRPCServerAddr.append(addr)
+            }
+        }
+        // config.rpcConcurrency = 4
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val config = RPCConfig()
-                if (seedRpc != null) {
-                    config.seedRPCServerAddr = StringArray(null)
-                    for (addr in seedRpc) {
-                        config.seedRPCServerAddr.append(addr)
-                    }
-                }
-                config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
-                // config.rpcConcurrency = 4
-
                 val subscription = Nkn.getSubscription(topic, subscriber, config)
                 val resp = hashMapOf(
                     "meta" to subscription.meta,
                     "expiresAt" to subscription.expiresAt
                 )
+
                 resultSuccess(result, resp)
                 return@launch
             } catch (e: Exception) {
@@ -288,19 +289,19 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
         val subscriberHashPrefix = call.argument<ByteArray>("subscriberHashPrefix")
 
+        val config = RPCConfig()
+        if (seedRpc != null) {
+            config.seedRPCServerAddr = StringArray(null)
+            for (addr in seedRpc) {
+                config.seedRPCServerAddr.append(addr)
+            }
+        }
+        // config.rpcConcurrency = 4
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val config = RPCConfig()
-                if (seedRpc != null) {
-                    config.seedRPCServerAddr = StringArray(null)
-                    for (addr in seedRpc) {
-                        config.seedRPCServerAddr.append(addr)
-                    }
-                }
-                config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
-                // config.rpcConcurrency = 4
-
                 val count = Nkn.getSubscribersCount(topic, subscriberHashPrefix, config)
+
                 resultSuccess(result, count)
                 return@launch
             } catch (e: Exception) {
@@ -312,19 +313,20 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
     private fun getHeight(call: MethodCall, result: MethodChannel.Result) {
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
+
+        val config = RPCConfig()
+        if (seedRpc != null) {
+            config.seedRPCServerAddr = StringArray(null)
+            for (addr in seedRpc) {
+                config.seedRPCServerAddr.append(addr)
+            }
+        }
+        // config.rpcConcurrency = 4
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val config = RPCConfig()
-                if (seedRpc != null) {
-                    config.seedRPCServerAddr = StringArray(null)
-                    for (addr in seedRpc) {
-                        config.seedRPCServerAddr.append(addr)
-                    }
-                }
-                config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
-                // config.rpcConcurrency = 4
-
                 val height = Nkn.getHeight(config)
+
                 resultSuccess(result, height)
                 return@launch
             } catch (e: Exception) {
@@ -339,19 +341,19 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val txPool = call.argument<Boolean>("txPool") ?: true
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
 
+        val config = RPCConfig()
+        if (seedRpc != null) {
+            config.seedRPCServerAddr = StringArray(null)
+            for (addr in seedRpc) {
+                config.seedRPCServerAddr.append(addr)
+            }
+        }
+        // config.rpcConcurrency = 4
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val config = RPCConfig()
-                if (seedRpc != null) {
-                    config.seedRPCServerAddr = StringArray(null)
-                    for (addr in seedRpc) {
-                        config.seedRPCServerAddr.append(addr)
-                    }
-                }
-                config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
-                // config.rpcConcurrency = 4
-
                 val nonce = Nkn.getNonce(address, txPool, config)
+
                 resultSuccess(result, nonce)
                 return@launch
             } catch (e: Exception) {
