@@ -32,6 +32,23 @@ class Wallet {
 
   Wallet({required this.walletConfig});
 
+  static Future<List<String>?> measureSeedRPCServer(List<String> seedRPCServerAddr) async {
+    try {
+      final Map data = await _methodChannel.invokeMethod('measureSeedRPCServer', {
+        'seedRpc': seedRPCServerAddr.isNotEmpty == true ? seedRPCServerAddr : [DEFAULT_SEED_RPC_SERVER],
+      });
+      List<String> result = [];
+      (data['seedRPCServerAddrList'] as List?)?.forEach((element) {
+        if (element is String) {
+          result.add(element);
+        }
+      });
+      return result;
+    } catch (e) {
+      throw e;
+    }
+  }
+
   static Future<Wallet> create(Uint8List? seed, {required WalletConfig config}) async {
     try {
       final Map data = await _methodChannel.invokeMethod('create', {
