@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
-import 'package:nkn_sdk_flutter/configure.dart';
 
 const String DEFAULT_SEED_RPC_SERVER = 'http://seed.nkn.org:30003';
 
@@ -38,6 +37,7 @@ class Wallet {
       final Map data = await _methodChannel.invokeMethod('create', {
         'seed': seed,
         'password': config.password,
+        'seedRpc': config.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : [DEFAULT_SEED_RPC_SERVER],
       });
       Wallet wallet = Wallet(walletConfig: config);
       wallet.keystore = data['keystore'];
@@ -55,6 +55,7 @@ class Wallet {
       final Map data = await _methodChannel.invokeMethod('restore', {
         'keystore': keystore,
         'password': config.password,
+        'seedRpc': config.seedRPCServerAddr?.isNotEmpty == true ? config.seedRPCServerAddr : [DEFAULT_SEED_RPC_SERVER],
       });
       Wallet wallet = Wallet(walletConfig: config);
       wallet.keystore = data['keystore'];

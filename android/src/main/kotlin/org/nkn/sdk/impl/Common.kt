@@ -1,7 +1,5 @@
 package org.nkn.sdk.impl
 
-import android.os.Handler
-import android.os.Looper
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
