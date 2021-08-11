@@ -90,7 +90,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 "event" to "onConnect",
                 "node" to hashMapOf("address" to node.addr, "publicKey" to node.pubKey),
                 "client" to hashMapOf("address" to client.address()),
-                "rpcServers" to rpcServers,
+                "rpcServers" to rpcServers
             )
             Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
             eventSinkSuccess(eventSink, resp)
@@ -110,8 +110,8 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                     "data" to String(msg.data, Charsets.UTF_8),
                     "type" to msg.type,
                     "encrypted" to msg.encrypted,
-                    "messageId" to msg.messageID,
-                ),
+                    "messageId" to msg.messageID
+                )
             )
             Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
             eventSinkSuccess(eventSink, resp)
@@ -188,7 +188,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 val data = hashMapOf(
                     "address" to client.address(),
                     "publicKey" to client.pubKey(),
-                    "seed" to client.seed(),
+                    "seed" to client.seed()
                 )
                 resultSuccess(result, data)
                 onConnect(client)
@@ -253,7 +253,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                         "data" to String(msg.data, Charsets.UTF_8),
                         "type" to msg.type,
                         "encrypted" to msg.encrypted,
-                        "messageId" to msg.messageID,
+                        "messageId" to msg.messageID
                     )
                     resultSuccess(result, resp)
                     return@launch
@@ -411,7 +411,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 val subscription = client?.getSubscription(topic, subscriber)
                 val resp = hashMapOf(
                     "meta" to subscription?.meta,
-                    "expiresAt" to subscription?.expiresAt,
+                    "expiresAt" to subscription?.expiresAt
                 )
                 resultSuccess(result, resp)
                 return@launch
