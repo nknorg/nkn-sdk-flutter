@@ -153,7 +153,6 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let seedRpc = args["seedRpc"] as? [String]
 
         clientQueue.async {
-            var error: NSError?
             let config: NknClientConfig = NknClientConfig()
             if(seedRpc != nil){
                 config.seedRPCServerAddr = NknStringArray(from: nil)
@@ -161,6 +160,10 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                     config.seedRPCServerAddr?.append(v)
                 }
             }
+            config.seedRPCServerAddr = NknMeasureSeedRPCServer(config.seedRPCServerAddr, 1500, nil)
+            // config.rpcConcurrency = 4
+
+            var error: NSError?
             let account = NknNewAccount(seed?.data, &error)!
             if (error != nil) {
                 self.resultError(result: result, error: error)
@@ -408,13 +411,13 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             }
         }
     }
-    
+
     private func getSubscription(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let _id = args["_id"] as! String
         let topic = args["topic"] as! String
         let subscriber = args["subscriber"] as! String
-        
+
         guard (clientMap.keys.contains(_id)) else {
             result(FlutterError(code: "", message: "client is null", details: ""))
             return
@@ -422,7 +425,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         guard let client = clientMap[_id] else{
             return
         }
-        
+
         clientTransferQueue.async {
             do {
                 let res: NknSubscription = try client.getSubscription(topic, subscriber: subscriber)
@@ -437,7 +440,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             }
         }
     }
-    
+
     private func getHeight(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let _id = args["_id"] as! String
@@ -462,7 +465,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             }
         }
     }
-    
+
     private func getNonce(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let _id = args["_id"] as! String

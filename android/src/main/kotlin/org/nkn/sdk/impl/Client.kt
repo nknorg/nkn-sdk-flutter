@@ -9,8 +9,8 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.*
 import nkn.*
-import org.nkn.sdk.IChannelHandler
 import org.bouncycastle.util.encoders.Hex
+import org.nkn.sdk.IChannelHandler
 import org.nkn.sdk.NknSdkFlutterPlugin
 
 class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, ViewModel() {
@@ -48,7 +48,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
     private suspend fun createClient(account: Account, identifier: String, config: ClientConfig): MultiClient = withContext(Dispatchers.IO) {
         val pubKey = Hex.toHexString(account.pubKey())
-        val id = if (identifier.isNullOrEmpty()) pubKey else "${identifier}.${pubKey}"
+        val id = if (identifier.isEmpty()) pubKey else "${identifier}.${pubKey}"
         if (clientMap.containsKey(id)) {
             closeClient(id)
         }
@@ -75,12 +75,12 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             val node = client.onConnect.next()
             val rpcServers = ArrayList<String>()
             for (i in 0..numSubClients) {
-                val c = client?.getClient(i)
+                val c = client.getClient(i)
                 val rpcNode = c?.node
                 var rpcAddr = rpcNode?.rpcAddr ?: ""
                 if (rpcAddr.isNotEmpty()) {
                     rpcAddr = "http://$rpcAddr"
-                    if(!rpcServers.contains(rpcAddr)) {
+                    if (!rpcServers.contains(rpcAddr)) {
                         rpcServers.add(rpcAddr)
                     }
                 }
@@ -90,7 +90,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 "event" to "onConnect",
                 "node" to hashMapOf("address" to node.addr, "publicKey" to node.pubKey),
                 "client" to hashMapOf("address" to client.address()),
-                "rpcServers" to rpcServers
+                "rpcServers" to rpcServers,
             )
             Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
             eventSinkSuccess(eventSink, resp)
@@ -110,8 +110,8 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                     "data" to String(msg.data, Charsets.UTF_8),
                     "type" to msg.type,
                     "encrypted" to msg.encrypted,
-                    "messageId" to msg.messageID
-                )
+                    "messageId" to msg.messageID,
+                ),
             )
             Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
             eventSinkSuccess(eventSink, resp)
@@ -169,21 +169,26 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val identifier = call.argument<String>("identifier") ?: ""
         val seed = call.argument<ByteArray>("seed")
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
-        val config = ClientConfig()
-        if (seedRpc != null) {
-            config.seedRPCServerAddr = StringArray(null)
-            for (addr in seedRpc) {
-                config.seedRPCServerAddr.append(addr)
-            }
-        }
+
         val account = Nkn.newAccount(seed)
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val config = ClientConfig()
+                if (seedRpc != null) {
+                    config.seedRPCServerAddr = StringArray(null)
+                    for (addr in seedRpc) {
+                        config.seedRPCServerAddr.append(addr)
+                    }
+                }
+                config.seedRPCServerAddr = Nkn.measureSeedRPCServer(config.seedRPCServerAddr, 1500)
+                // config.rpcConcurrency = 4
+
                 val client = createClient(account, identifier, config)
                 val data = hashMapOf(
                     "address" to client.address(),
                     "publicKey" to client.pubKey(),
-                    "seed" to client.seed()
+                    "seed" to client.seed(),
                 )
                 resultSuccess(result, data)
                 onConnect(client)
@@ -248,7 +253,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                         "data" to String(msg.data, Charsets.UTF_8),
                         "type" to msg.type,
                         "encrypted" to msg.encrypted,
-                        "messageId" to msg.messageID
+                        "messageId" to msg.messageID,
                     )
                     resultSuccess(result, resp)
                     return@launch
@@ -320,7 +325,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val hash = client!!.subscribe(identifier, topic, duration.toLong(), meta, transactionConfig)
+                val hash = client?.subscribe(identifier, topic, duration.toLong(), meta, transactionConfig)
                 resultSuccess(result, hash)
                 return@launch
             } catch (e: Throwable) {
@@ -347,7 +352,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val hash = client!!.unsubscribe(identifier, topic, transactionConfig)
+                val hash = client?.unsubscribe(identifier, topic, transactionConfig)
                 resultSuccess(result, hash)
                 return@launch
             } catch (e: Exception) {
@@ -374,13 +379,11 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val subscribers = client!!.getSubscribers(topic, offset.toLong(), limit.toLong(), meta, txPool, subscriberHashPrefix)
+                val subscribers = client?.getSubscribers(topic, offset.toLong(), limit.toLong(), meta, txPool, subscriberHashPrefix)
 
                 val resp = hashMapOf<String, String>()
-
-                subscribers.subscribers.range { addr, value ->
-                    val meta = value?.trim() ?: ""
-                    resp[addr] = meta
+                subscribers?.subscribers?.range { addr, value ->
+                    resp[addr] = value?.trim() ?: ""
                     true
                 }
                 resultSuccess(result, resp)
@@ -405,10 +408,10 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val subscription = client!!.getSubscription(topic, subscriber)
+                val subscription = client?.getSubscription(topic, subscriber)
                 val resp = hashMapOf(
-                    "meta" to subscription.meta,
-                    "expiresAt" to subscription.expiresAt
+                    "meta" to subscription?.meta,
+                    "expiresAt" to subscription?.expiresAt,
                 )
                 resultSuccess(result, resp)
                 return@launch
@@ -432,7 +435,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val count = client!!.getSubscribersCount(topic, subscriberHashPrefix)
+                val count = client?.getSubscribersCount(topic, subscriberHashPrefix)
                 resultSuccess(result, count)
                 return@launch
             } catch (e: Exception) {
@@ -453,7 +456,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val height = client!!.height
+                val height = client?.height
                 resultSuccess(result, height)
                 return@launch
             } catch (e: Exception) {
@@ -476,7 +479,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val nonce = client!!.getNonceByAddress(address, txPool)
+                val nonce = client?.getNonceByAddress(address, txPool)
                 resultSuccess(result, nonce)
                 return@launch
             } catch (e: Exception) {
