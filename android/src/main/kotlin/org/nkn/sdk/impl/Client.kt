@@ -318,6 +318,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val duration = call.argument<Int>("duration")!!
         val meta = call.argument<String>("meta")
         val fee = call.argument<String>("fee") ?: "0"
+        val nonce = call.argument<Long>("nonce")
 
         if (!clientMap.containsKey(_id)) {
             result.error("", "client is null", "")
@@ -326,6 +327,9 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         val transactionConfig = TransactionConfig()
         transactionConfig.fee = fee
+        if (nonce != null) {
+            transactionConfig.nonce = nonce
+        }
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -346,6 +350,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val identifier = call.argument<String>("identifier") ?: ""
         val topic = call.argument<String>("topic")!!
         val fee = call.argument<String>("fee") ?: "0"
+        val nonce = call.argument<Long>("nonce")
 
         if (!clientMap.containsKey(_id)) {
             result.error("", "client is null", "")
@@ -354,6 +359,9 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         val transactionConfig = TransactionConfig()
         transactionConfig.fee = fee
+        if (nonce != null) {
+            transactionConfig.nonce = nonce
+        }
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
