@@ -1,3 +1,7 @@
+## 0.1.8
+
+* Add method measureSeedRPCServer and Add nonce params in subscribe/unsubscribe
+
 ## 0.1.7
 
 * Add txPool params in publishText
