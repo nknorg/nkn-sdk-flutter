@@ -39,7 +39,7 @@ class Wallet {
       });
       List<String> result = [];
       (data['seedRPCServerAddrList'] as List?)?.forEach((element) {
-        if (element is String) {
+        if (element is String && element.isNotEmpty) {
           result.add(element);
         }
       });
