@@ -1,3 +1,7 @@
+## 0.1.9
+
+* Fix nonce params type
+
 ## 0.1.8
 
 * Add method measureSeedRPCServer and Add nonce params in subscribe/unsubscribe
