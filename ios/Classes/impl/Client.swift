@@ -152,34 +152,34 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let seed = args["seed"] as? FlutterStandardTypedData
         let seedRpc = args["seedRpc"] as? [String]
 
+        let config: NknClientConfig = NknClientConfig()
+        if(seedRpc != nil){
+            config.seedRPCServerAddr = NknStringArray(from: nil)
+            for (_, v) in seedRpc!.enumerated() {
+                config.seedRPCServerAddr?.append(v)
+            }
+        }
+        // config.rpcConcurrency = 4
+
+        var error: NSError?
+        let account = NknNewAccount(seed?.data, &error)!
+        if (error != nil) {
+            self.resultError(result: result, error: error)
+            return
+        }
+
+        guard let client = self.createClient(account: account, identifier: identifier, config: config) else {
+            self.resultError(result: result, code: "", message: "connect fail")
+            return
+        }
+
         clientQueue.async {
-            let config: NknClientConfig = NknClientConfig()
-            if(seedRpc != nil){
-                config.seedRPCServerAddr = NknStringArray(from: nil)
-                for (_, v) in seedRpc!.enumerated() {
-                    config.seedRPCServerAddr?.append(v)
-                }
-            }
-            config.seedRPCServerAddr = NknMeasureSeedRPCServer(config.seedRPCServerAddr, 1500, nil)
-            // config.rpcConcurrency = 4
-
-            var error: NSError?
-            let account = NknNewAccount(seed?.data, &error)!
-            if (error != nil) {
-                self.resultError(result: result, error: error)
-                return
-            }
-
-            guard let client = self.createClient(account: account, identifier: identifier, config: config) else {
-                self.resultError(result: result, code: "", message: "connect fail")
-                return
-            }
-
             var resp:[String:Any] = [String:Any]()
             resp["address"] = client.address()
             resp["publicKey"] = client.pubKey()
             resp["seed"] = client.seed()
             self.resultSuccess(result: result, resp: resp)
+
             self.onConnect(client: client)
             self.onMessage(client: client)
         }
@@ -188,8 +188,10 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
     private func close(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let _id = args["_id"] as! String
+
         clientQueue.async {
             self.closeClient(id: _id)
+
             self.resultSuccess(result: result, resp: nil)
         }
     }
@@ -210,7 +212,6 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         guard let client = clientMap[_id] else{
             return
         }
-
         let nknDests = NknStringArray(from: nil)!
         if(!dests.isEmpty) {
             for dest in dests {
@@ -242,6 +243,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                     return
                 } else {
                     try client.sendText(nknDests, data: data, config: config)
+
                     var resp: [String: Any] = [String: Any]()
                     resp["messageId"] = config.messageID
                     self.resultSuccess(result: result, resp: resp)
@@ -277,6 +279,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 config.txPool = txPool
 
                 try client.publishText(topic, data: data, config: config)
+
                 var resp: [String: Any] = [String: Any]()
                 resp["messageId"] = config.messageID
                 self.resultSuccess(result: result, resp: resp)
@@ -306,7 +309,6 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         clientTransferQueue.async {
             var error: NSError?
-
             let config: NknTransactionConfig = NknTransactionConfig()
             config.fee = fee
 
@@ -338,7 +340,6 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         clientTransferQueue.async {
             var error: NSError?
-
             let config: NknTransactionConfig = NknTransactionConfig()
             config.fee = fee
 
@@ -376,6 +377,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 let res: NknSubscribers? = try client.getSubscribers(topic, offset: offset, limit: limit, meta: meta, txPool: txPool, subscriberHashPrefix: subscriberHashPrefix?.data)
                 let mapPro = MapProtocol()
                 res?.subscribers?.range(mapPro)
+
                 self.resultSuccess(result: result, resp: mapPro.result)
                 return
             } catch let error {
@@ -403,6 +405,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             do {
                 var count: Int = 0
                 try client.getSubscribersCount(topic, subscriberHashPrefix: subscriberHashPrefix?.data, ret0_: &count)
+
                 self.resultSuccess(result: result, resp: count)
                 return
             } catch let error {
@@ -429,6 +432,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         clientTransferQueue.async {
             do {
                 let res: NknSubscription = try client.getSubscription(topic, subscriber: subscriber)
+
                 var resp: [String: Any] = [String: Any]()
                 resp["meta"] = res.meta
                 resp["expiresAt"] = res.expiresAt
@@ -457,6 +461,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             do {
                 var height: Int32 = 0
                 try client.getHeight(&height)
+
                 self.resultSuccess(result: result, resp: height)
                 return
             } catch let error {
@@ -484,6 +489,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             do {
                 var nonce: Int64 = 0
                 try client.getNonceByAddress(address, txPool: txPool, ret0_: &nonce)
+
                 self.resultSuccess(result: result, resp: nonce)
                 return
             } catch let error {
