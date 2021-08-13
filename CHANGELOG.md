@@ -1,3 +1,7 @@
+## 0.1.10
+
+* Fix ios client message queue broken
+
 ## 0.1.9
 
 * Fix nonce params type
