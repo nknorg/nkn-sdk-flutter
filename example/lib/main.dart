@@ -117,7 +117,8 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      int nonce = await Wallet.getNonceByAddress('NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
+                      int nonce = await Wallet.getNonceByAddress(
+                          'NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
                       print(nonce);
                     },
                     child: Text('getNonceByAddress'),
@@ -223,7 +224,8 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.getNonceByAddress('NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
+                      var res = await _client1.getNonceByAddress(
+                          'NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
                       print(res);
                     },
                     child: Text('getNonceByAddress'),
