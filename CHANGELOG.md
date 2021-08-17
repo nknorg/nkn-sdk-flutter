@@ -1,3 +1,7 @@
+## 0.1.11
+
+* Update go sdk version
+
 ## 0.1.10
 
 * Fix ios client message queue broken
