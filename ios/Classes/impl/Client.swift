@@ -11,6 +11,9 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
     let clientQueue = DispatchQueue(label: "org.nkn.sdk/client/queue", qos: .default, attributes: .concurrent)
     private var clientWorkItem: DispatchWorkItem?
 
+    let clientConnectQueue = DispatchQueue(label: "org.nkn.sdk/client/connect/queue", qos: .default, attributes: .concurrent)
+    private var clientConnectWorkItem: DispatchWorkItem?
+
     let clientSendQueue = DispatchQueue(label: "org.nkn.sdk/client/send/queue", qos: .default, attributes: .concurrent)
     private var clientSendWorkItem: DispatchWorkItem?
 
@@ -79,6 +82,13 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         clientMap.removeValue(forKey: id)
     }
 
+    private func addClientConnectQueue(client: NknMultiClient) {
+        clientConnectWorkItem = DispatchWorkItem {
+            self.onConnect(client: client)
+        }
+        clientConnectQueue.async(execute: clientConnectWorkItem!)
+    }
+
     private func onConnect(client: NknMultiClient) {
         guard let node = client.onConnect?.next() else {
             return
@@ -130,6 +140,8 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         ]
         NSLog("%@", resp)
         self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
+
+        // loop
         self.addMessageReceiveQueue(client: client)
     }
 
@@ -195,12 +207,12 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             resp["publicKey"] = client.pubKey()
             resp["seed"] = client.seed()
             self.resultSuccess(result: result, resp: resp)
-
-            self.onConnect(client: client)
-
-            self.addMessageReceiveQueue(client: client)
         }
         clientQueue.async(execute: clientWorkItem!)
+
+        self.addClientConnectQueue(client: client)
+
+        self.addMessageReceiveQueue(client: client)
     }
 
     private func close(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -282,6 +294,8 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let data = args["data"] as! String
         let maxHoldingSeconds = args["maxHoldingSeconds"] as? Int32 ?? 0
         let txPool = args["txPool"] as? Bool ?? false
+        let offset = args["offset"] as? Int32 ?? 0
+        let limit = args["limit"] as? Int32 ?? 1000
 
         guard (clientMap.keys.contains(_id)) else {
             result(FlutterError(code: "", message: "client is null", details: ""))
@@ -297,6 +311,8 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 config.maxHoldingSeconds = maxHoldingSeconds < 0 ? 0 : maxHoldingSeconds
                 config.messageID = NknRandomBytes(Int(NknMessageIDSize), nil)
                 config.txPool = txPool
+                config.offset = offset
+                config.limit = limit
 
                 try client.publishText(topic, data: data, config: config)
 
