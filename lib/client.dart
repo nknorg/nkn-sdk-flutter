@@ -215,7 +215,10 @@ class Client {
   /// [publishText] sends bytes or string data to all subscribers of a topic with an
   /// optional config.
   Future<OnMessage> publishText(String topic, String data,
-      {int maxHoldingSeconds = 8640000, bool txPool = false, int offset = 0, int limit = 1000}) async {
+      {int maxHoldingSeconds = 8640000,
+      bool txPool = false,
+      int offset = 0,
+      int limit = 1000}) async {
     try {
       final Map resp = await _methodChannel.invokeMethod('publishText', {
         '_id': this.address,
