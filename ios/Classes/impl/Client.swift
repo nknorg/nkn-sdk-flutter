@@ -25,6 +25,9 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
     let numSubClients = 3
     var clientMap: [String:NknMultiClient] = [String:NknMultiClient]()
+    
+    let onMessageInterval = 100
+    var currentOnMessageCount = 0
 
     func install(binaryMessenger: FlutterBinaryMessenger) {
         self.methodChannel = FlutterMethodChannel(name: CHANNEL_NAME, binaryMessenger: binaryMessenger)
@@ -140,7 +143,14 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         ]
         NSLog("%@", resp)
         eventSink?(resp)
-
+        
+        // todo, queue
+        currentOnMessageCount += 1
+        if (currentOnMessageCount >= onMessageInterval) {
+            usleep(useconds_t(100 * 1000))
+            currentOnMessageCount = 0
+        }
+        
         // loop
         onMessage(client: client)
     }
