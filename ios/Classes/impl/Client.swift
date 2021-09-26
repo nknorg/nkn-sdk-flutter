@@ -113,7 +113,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
         resp["rpcServers"] = rpcServers
         NSLog("%@", resp)
-        self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
+        eventSink?(resp)
     }
 
     private func addMessageReceiveQueue(client: NknMultiClient) {
@@ -139,10 +139,10 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             "messageId": msg.messageID != nil ? FlutterStandardTypedData(bytes: msg.messageID!) : nil
         ]
         NSLog("%@", resp)
-        self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
+        eventSink?(resp)
 
         // loop
-        self.addMessageReceiveQueue(client: client)
+        onMessage(client: client)
     }
 
     private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -187,7 +187,6 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 config.seedRPCServerAddr?.append(v)
             }
         }
-        // config.rpcConcurrency = 4
 
         var error: NSError?
         let account = NknNewAccount(seed?.data, &error)!
@@ -196,23 +195,22 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             return
         }
 
-        guard let client = self.createClient(account: account, identifier: identifier, config: config) else {
-            self.resultError(result: result, code: "", message: "connect fail")
-            return
-        }
-
         clientWorkItem = DispatchWorkItem {
+            guard let client = self.createClient(account: account, identifier: identifier, config: config) else {
+                self.resultError(result: result, code: "", message: "connect fail")
+                return
+            }
+
             var resp:[String:Any] = [String:Any]()
             resp["address"] = client.address()
             resp["publicKey"] = client.pubKey()
             resp["seed"] = client.seed()
             self.resultSuccess(result: result, resp: resp)
+
+            self.onConnect(client: client)
+            self.onMessage(client: client)
         }
         clientQueue.async(execute: clientWorkItem!)
-
-        self.addClientConnectQueue(client: client)
-
-        self.addMessageReceiveQueue(client: client)
     }
 
     private func close(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
