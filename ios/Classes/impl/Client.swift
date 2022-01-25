@@ -192,7 +192,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         let config: NknClientConfig = NknClientConfig()
         if(seedRpc != nil){
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -251,10 +251,11 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         guard let client = clientMap[_id] else{
             return
         }
-        let nknDests = NknStringArray(from: nil)!
+        let nknDests: NkngomobileStringArray? = NkngomobileNewStringArrayFromString(nil)
+        
         if(!dests.isEmpty) {
             for dest in dests {
-                nknDests.append(dest)
+                nknDests?.append(dest)
             }
         }
 
@@ -431,7 +432,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             do {
                 let res: NknSubscribers? = try client.getSubscribers(topic, offset: offset, limit: limit, meta: meta, txPool: txPool, subscriberHashPrefix: subscriberHashPrefix?.data)
                 let mapPro = MapProtocol()
-                res?.subscribers?.range(mapPro)
+                res?.subscribers?.range(mapPro as! NkngomobileStringMapFuncProtocol)
 
                 self.resultSuccess(result: result, resp: mapPro.result)
                 return

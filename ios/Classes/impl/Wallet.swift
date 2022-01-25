@@ -68,11 +68,11 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let seedRpc = args["seedRpc"] as? [String]
 
         walletWorkItem = DispatchWorkItem {
-            var seedRPCServerAddr = NknStringArray(from: nil)
+            var seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 seedRPCServerAddr?.append(v)
             }
-            seedRPCServerAddr = NknMeasureSeedRPCServer(seedRPCServerAddr, 1500, nil)
+            seedRPCServerAddr = UtilsMeasureSeedRPCServerReturnStringArray(seedRPCServerAddr as! NkngomobileStringArray, 1500, nil)
 
             var seedRPCServerAddrs = [String]()
             let elements = seedRPCServerAddr?.join(",").split(separator: ",")
@@ -100,7 +100,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let config = NknWalletConfig()
         config.password = password
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileStringArray(from: nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -140,7 +140,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let config = NknWalletConfig()
         config.password = password
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -188,7 +188,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -229,7 +229,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -283,7 +283,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -299,7 +299,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             }
 
             let mapPro = MapProtocol()
-            res?.subscribers?.range(mapPro)
+            res?.subscribers?.range(mapPro as! NkngomobileStringMapFuncProtocol)
 
             self.resultSuccess(result: result, resp: mapPro.result)
             return
@@ -315,7 +315,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -346,7 +346,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -376,7 +376,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
@@ -406,7 +406,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
         let config = NknWalletConfig()
         if(seedRpc != nil) {
-            config.seedRPCServerAddr = NknStringArray(from: nil)
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 config.seedRPCServerAddr?.append(v)
             }
