@@ -375,6 +375,7 @@ compatibility.
 @property (nonatomic) int32_t wsWriteTimeout;
 @property (nonatomic) int32_t minReconnectInterval;
 @property (nonatomic) int32_t maxReconnectInterval;
+@property (nonatomic) BOOL allowUnencrypted;
 @property (nonatomic) NknMessageConfig* _Nullable messageConfig;
 @property (nonatomic) NcpConfig* _Nullable sessionConfig;
 /**
@@ -1371,6 +1372,12 @@ FOUNDATION_EXPORT const int32_t NknTextType;
  */
 + (NSError* _Nullable) errNotNanoPay;
 + (void) setErrNotNanoPay:(NSError* _Nullable)v;
+
+/**
+ * Error definitions.
+ */
++ (NSError* _Nullable) errUnencryptedMessage;
++ (void) setErrUnencryptedMessage:(NSError* _Nullable)v;
 
 /**
  * Error definitions.
