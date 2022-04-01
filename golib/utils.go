@@ -1,4 +1,4 @@
-package utils
+package nkn
 
 import (
 	"encoding/json"

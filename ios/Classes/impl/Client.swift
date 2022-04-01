@@ -360,6 +360,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             config.fee = fee
             if (nonce != nil) {
                 config.nonce = Int64(nonce!)
+                config.fixNonce = true
             }
 
             let hash = client.subscribe(identifier, topic: topic, duration: duration, meta: meta, config: config, error: &error)
@@ -396,6 +397,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             config.fee = fee
             if (nonce != nil) {
                 config.nonce = Int64(nonce!)
+                config.fixNonce = true
             }
 
             let hash = client.unsubscribe(identifier, topic: topic, config: config, error: &error)

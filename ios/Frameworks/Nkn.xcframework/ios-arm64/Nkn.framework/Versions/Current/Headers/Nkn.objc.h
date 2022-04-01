@@ -725,10 +725,13 @@ payment amount can increase monotonically.
 - (nonnull instancetype)init;
 /**
  * IncrementAmount increments the NanoPay amount by delta and returns the signed
-NanoPay transaction. Delta is the string representation of the amount in unit
-of NKN to avoid precision loss. For example, "0.1" will be parsed as 0.1 NKN.
+NanoPay transaction. If length of fee is greater than zero, it will parsed as
+transaction fee, otherwise the default transaction fee (passed when creating
+nanopay) will be used. Delta and fee are the string representation of the
+amount in unit of NKN to avoid precision loss. For example, "0.1" will be
+parsed as 0.1 NKN.
  */
-- (TransactionTransaction* _Nullable)incrementAmount:(NSString* _Nullable)delta error:(NSError* _Nullable* _Nullable)error;
+- (TransactionTransaction* _Nullable)incrementAmount:(NSString* _Nullable)delta fee:(NSString* _Nullable)fee error:(NSError* _Nullable* _Nullable)error;
 /**
  * Recipient returns the recipient wallet address.
  */
@@ -973,7 +976,8 @@ added to avoid gomobile compile error.
 @end
 
 /**
- * TransactionConfig is the config for making a transaction.
+ * TransactionConfig is the config for making a transaction. If Nonce is 0 and
+FixNonce is false, then nonce will be fetched from RPC call.
  */
 @interface NknTransactionConfig : NSObject <goSeqRefInterface> {
 }
@@ -983,6 +987,7 @@ added to avoid gomobile compile error.
 - (nonnull instancetype)init;
 @property (nonatomic) NSString* _Nonnull fee;
 @property (nonatomic) int64_t nonce;
+@property (nonatomic) BOOL fixNonce;
 @property (nonatomic) NSData* _Nullable attributes;
 @end
 

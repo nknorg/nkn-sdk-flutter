@@ -48,6 +48,10 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             getBalance(call, result: result)
         case "transfer":
             transfer(call, result: result)
+        case "subscribe":
+            subscribe(call, result: result)
+        case "unsubscribe":
+            unsubscribe(call, result: result)
         case "getSubscribersCount":
             getSubscribersCount(call, result: result)
         case "getSubscribers":
@@ -72,7 +76,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             for (_, v) in seedRpc!.enumerated() {
                 seedRPCServerAddr?.append(v)
             }
-            seedRPCServerAddr = UtilsMeasureSeedRPCServerReturnStringArray(seedRPCServerAddr as! NkngomobileStringArray, 1500, nil)
+            seedRPCServerAddr = NknMeasureSeedRPCServer(seedRPCServerAddr as! NkngomobileStringArray, 1500, nil)
 
             var seedRPCServerAddrs = [String]()
             let elements = seedRPCServerAddr?.join(",").split(separator: ",")
@@ -270,7 +274,113 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
         walletMoneyQueue.async(execute: walletMoneyWorkItem!)
     }
+    
+    func subscribe(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let seed = args["seed"] as? FlutterStandardTypedData
+        let identifier = args["identifier"] as? String ?? ""
+        let topic = args["topic"] as! String
+        let duration = args["duration"] as! Int
+        let meta = args["meta"] as? String
+        let fee = args["fee"] as? String ?? "0"
+        let nonce = args["nonce"] as? Int
+        let seedRpc = args["seedRpc"] as? [String]
 
+        let config = NknWalletConfig()
+        if(seedRpc != nil) {
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
+            for (_, v) in seedRpc!.enumerated() {
+                config.seedRPCServerAddr?.append(v)
+            }
+        }
+        // config.rpcConcurrency = 4
+
+        walletMoneyWorkItem = DispatchWorkItem {
+            var error: NSError?
+            let account:NknAccount? = NknNewAccount(seed?.data, &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+
+            let wallet = NknNewWallet(account, config, &error)
+            if (error != nil) {
+                self.resultError(result: result,error: error)
+                return
+            }
+
+            let transactionConfig: NknTransactionConfig = NknTransactionConfig()
+            transactionConfig.fee = fee
+            if (nonce != nil) {
+                transactionConfig.nonce = Int64(nonce!)
+                transactionConfig.fixNonce = true
+            }
+        
+
+            let hash = wallet?.subscribe(identifier, topic: topic, duration: duration, meta: meta, config: transactionConfig, error: &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+
+            self.resultSuccess(result: result, resp: hash)
+            return
+        }
+        walletMoneyQueue.async(execute: walletMoneyWorkItem!)
+    }
+
+    func unsubscribe(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let seed = args["seed"] as? FlutterStandardTypedData
+        let identifier = args["identifier"] as? String ?? ""
+        let topic = args["topic"] as! String
+        let fee = args["fee"] as? String ?? "0"
+        let nonce = args["nonce"] as? Int
+        let seedRpc = args["seedRpc"] as? [String]
+
+        let config = NknWalletConfig()
+        if(seedRpc != nil) {
+            config.seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
+            for (_, v) in seedRpc!.enumerated() {
+                config.seedRPCServerAddr?.append(v)
+            }
+        }
+        // config.rpcConcurrency = 4
+
+        walletMoneyWorkItem = DispatchWorkItem {
+            var error: NSError?
+            let account:NknAccount? = NknNewAccount(seed?.data, &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+
+            let wallet = NknNewWallet(account, config, &error)
+            if (error != nil) {
+                self.resultError(result: result,error: error)
+                return
+            }
+
+            let transactionConfig: NknTransactionConfig = NknTransactionConfig()
+            transactionConfig.fee = fee
+            if (nonce != nil) {
+                transactionConfig.nonce = Int64(nonce!)
+                transactionConfig.fixNonce = true
+            }
+        
+
+            let hash = wallet?.unsubscribe(identifier, topic: topic, config: transactionConfig, error: &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+
+            self.resultSuccess(result: result, resp: hash)
+            return
+        }
+        walletMoneyQueue.async(execute: walletMoneyWorkItem!)
+    }
+    
     private func getSubscribers(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let topic = args["topic"] as! String

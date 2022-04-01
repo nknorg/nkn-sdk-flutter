@@ -337,6 +337,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         transactionConfig.fee = fee
         if (nonce != null) {
             transactionConfig.nonce = nonce.toLong()
+            transactionConfig.fixNonce = true
         }
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -369,6 +370,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         transactionConfig.fee = fee
         if (nonce != null) {
             transactionConfig.nonce = nonce.toLong()
+            transactionConfig.fixNonce = true
         }
 
         viewModelScope.launch(Dispatchers.IO) {
