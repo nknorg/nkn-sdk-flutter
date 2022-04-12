@@ -258,6 +258,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             transactionConfig.fee = fee
             if (nonce != nil) {
                 transactionConfig.nonce = Int64(nonce!)
+                transactionConfig.fixNonce = true
             }
             if(attributes != nil){
                 transactionConfig.attributes = attributes?.data

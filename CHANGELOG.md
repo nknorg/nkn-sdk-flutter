@@ -1,3 +1,7 @@
+## 0.1.19
+
+* Add fixNonce config
+
 ## 0.1.18
 
 * Upgrade NKN SDK, add fixNonce config
