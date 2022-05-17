@@ -46,6 +46,7 @@ The input string will be split to string array by whitespace.
  * Get gets an element to the string array.
  */
 - (NSString* _Nonnull)get:(long)i;
+- (NSString* _Nonnull)getJson;
 /**
  * Join returns a single string by concatenates the elements
  */

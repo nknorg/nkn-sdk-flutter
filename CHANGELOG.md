@@ -1,3 +1,7 @@
+## 0.2.0
+
+* Add crypto module
+
 ## 0.1.19
 
 * Add fixNonce config

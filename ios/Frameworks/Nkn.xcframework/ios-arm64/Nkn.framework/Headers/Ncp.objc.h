@@ -62,6 +62,8 @@
 // skipped method Connection.SendWindowUsed with unsupported parameter or return types
 
 - (void)start;
+- (BOOL)tryLock;
+- (BOOL)tryRLock;
 - (void)unlock;
 @end
 
@@ -123,6 +125,8 @@
 
 // skipped method Session.SetWriteDeadline with unsupported parameter or return types
 
+- (BOOL)tryLock;
+- (BOOL)tryRLock;
 - (void)unlock;
 - (BOOL)write:(NSData* _Nullable)b _:(long* _Nullable)_ error:(NSError* _Nullable* _Nullable)error;
 @end

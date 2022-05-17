@@ -249,10 +249,15 @@ github.com/nknorg/nkn-sdk-go v1.4.1/go.mod h1:/2FtpRM4mWpze03V8FIoESQCa6wCdPRPQO
 github.com/nknorg/nkn/v2 v2.0.6/go.mod h1:cXl2WTv72trEXKJiNH0dCMygMtL8nJne07dWajDlRIo=
 github.com/nknorg/nkn/v2 v2.1.7 h1:MYrA+Nfg2vnYJPP10OmAePRAMjbXfwmOXyknE1djudY=
 github.com/nknorg/nkn/v2 v2.1.7/go.mod h1:4xzrHJCI/FDFZmlt606Mn9ScKY4UUCFoaWydL1TzQRs=
+github.com/nknorg/nkn/v2 v2.1.8 h1:h25rqQ0E8CvlN8Jm4zF6CBBLgwdoSS7HHdrU4ZYcmjA=
+github.com/nknorg/nkn/v2 v2.1.8/go.mod h1:bKBIGARD/pVbHog5091BaXvmsFq74KIvy9jUDUkvsSs=
 github.com/nknorg/nkngomobile v0.0.0-20220125080321-848ddd2e5157 h1:boS8HmbvuSYZ3unKjoTp/C4wulQBcAvNiQfkEcCqv0Q=
 github.com/nknorg/nkngomobile v0.0.0-20220125080321-848ddd2e5157/go.mod h1:UR/wt+6fFEamWuXx3JKhOABXqVe5dzrlTUpEVu0QOCA=
+github.com/nknorg/nkngomobile v0.0.0-20220323091714-67fe6d5e79ff h1:nEW+8i3cmpitccDgzfqY+KYVybXb2MAICGaz7CGWaIE=
+github.com/nknorg/nkngomobile v0.0.0-20220323091714-67fe6d5e79ff/go.mod h1:UR/wt+6fFEamWuXx3JKhOABXqVe5dzrlTUpEVu0QOCA=
 github.com/nknorg/nnet v0.0.0-20200521002812-357d1b11179f/go.mod h1:4DHEQEMhlRGIKGSyhATdjeusdqaHafDatadtpeHBpvI=
 github.com/nknorg/nnet v0.0.0-20210516000534-f80d3763d1bd/go.mod h1:4DHEQEMhlRGIKGSyhATdjeusdqaHafDatadtpeHBpvI=
+github.com/nknorg/nnet v0.0.0-20220217113219-4d27780990b1/go.mod h1:4DHEQEMhlRGIKGSyhATdjeusdqaHafDatadtpeHBpvI=
 github.com/nknorg/portmapper v0.0.0-20200114081049-1c03cdccc283/go.mod h1:dL4PQJ4670oTO6LqvkjrBQEkD+iMiOYjlKRBBw55Csg=
 github.com/nrdcg/auroradns v1.0.1/go.mod h1:y4pc0i9QXYlFCWrhWrUSIETnZgrf4KuwjDIWmmXo3JI=
 github.com/nrdcg/dnspod-go v0.4.0/go.mod h1:vZSoFSFeQVm2gWLMkyX61LZ8HI3BaqtHZWgPTGKr6KQ=

@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:nkn_sdk_flutter/client.dart';
+import 'package:nkn_sdk_flutter/crypto.dart';
 import 'package:nkn_sdk_flutter/utils/hash.dart';
 import 'package:nkn_sdk_flutter/utils/hex.dart';
 import 'package:nkn_sdk_flutter/wallet.dart';
@@ -272,6 +274,44 @@ class _MyAppState extends State<MyApp> {
                       print(res);
                     },
                     child: Text('sendText'),
+                  ),
+                ],
+              ),
+              Text(
+                'Crypto',
+                style: TextStyle(fontSize: 16),
+              ),
+              Wrap(
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      Wallet wallet = await Wallet.create(
+                          hexDecode(
+                              'a2df9fafa747b4da6afa58cdee8e170f0a71815584c3ed3bfa52040c89d0bd61'),
+                          config: WalletConfig(password: '123'));
+                      Uint8List privateKey =
+                          await Crypto.getPrivateKeyFromSeed(wallet.seed);
+                      var res = await Crypto.sign(privateKey,
+                          Uint8List.fromList(utf8.encode('Hello, world!')));
+                      print(hexEncode(res));
+                    },
+                    child: Text('sign'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      Wallet wallet = await Wallet.create(
+                          hexDecode(
+                              'a2df9fafa747b4da6afa58cdee8e170f0a71815584c3ed3bfa52040c89d0bd61'),
+                          config: WalletConfig(password: '123'));
+
+                      bool verified = await Crypto.verify(
+                          wallet.publicKey,
+                          Uint8List.fromList(utf8.encode('Hello, world!')),
+                          hexDecode(
+                              'fc81c36aa9002bb973fb7db3b8d334ae52194edf5e051d4c5105d20fbbad7287cd5172aea0acac43d843bf3b692aa486d96e4dcfbed9b7dcfb6e7c385c070d0d'));
+                      print(verified);
+                    },
+                    child: Text('verify'),
                   ),
                 ],
               ),
