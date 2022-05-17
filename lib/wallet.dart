@@ -51,13 +51,14 @@ class Wallet {
   /// finished state, returned string array will contain zero elements. Timeout is
   /// in millisecond.
   static Future<List<String>?> measureSeedRPCServer(
-      List<String> seedRPCServerAddr) async {
+      List<String> seedRPCServerAddr, int? timeout) async {
     try {
       final Map data =
           await _methodChannel.invokeMethod('measureSeedRPCServer', {
         'seedRpc': seedRPCServerAddr.isNotEmpty == true
             ? seedRPCServerAddr
             : [DEFAULT_SEED_RPC_SERVER],
+        'timeout': timeout,
       });
       List<String> result = [];
       (data['seedRPCServerAddrList'] as List?)?.forEach((element) {
@@ -237,9 +238,8 @@ class Wallet {
   /// prefix byte will reduce result count to about 1/256, and also reduce response
   /// time to about 1/256 if there are a lot of subscribers. This is a good way to
   /// sample subscribers randomly with low cost.
-  static Future<int> getSubscribersCount(
-      String topic, Uint8List subscriberHashPrefix,
-      {RpcConfig? config}) async {
+  static Future<int> getSubscribersCount(String topic,
+      {Uint8List? subscriberHashPrefix, RpcConfig? config}) async {
     try {
       int count = await _methodChannel.invokeMethod('getSubscribersCount', {
         'topic': topic,

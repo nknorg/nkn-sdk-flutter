@@ -70,13 +70,14 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
     private func measureSeedRPCServer(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let seedRpc = args["seedRpc"] as? [String]
+        let timeout = args["timeout"] as? Int32 ?? 3000
 
         walletWorkItem = DispatchWorkItem {
             var seedRPCServerAddr = NkngomobileNewStringArrayFromString(nil)
             for (_, v) in seedRpc!.enumerated() {
                 seedRPCServerAddr?.append(v)
             }
-            seedRPCServerAddr = NknMeasureSeedRPCServer(seedRPCServerAddr as! NkngomobileStringArray, 1500, nil)
+            seedRPCServerAddr = NknMeasureSeedRPCServer(seedRPCServerAddr as! NkngomobileStringArray, timeout, nil)
 
             var seedRPCServerAddrs = [String]()
             let elements = seedRPCServerAddr?.join(",").split(separator: ",")
@@ -275,7 +276,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
         walletMoneyQueue.async(execute: walletMoneyWorkItem!)
     }
-    
+
     func subscribe(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let seed = args["seed"] as? FlutterStandardTypedData
@@ -316,7 +317,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 transactionConfig.nonce = Int64(nonce!)
                 transactionConfig.fixNonce = true
             }
-        
+
 
             let hash = wallet?.subscribe(identifier, topic: topic, duration: duration, meta: meta, config: transactionConfig, error: &error)
             if (error != nil) {
@@ -368,7 +369,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 transactionConfig.nonce = Int64(nonce!)
                 transactionConfig.fixNonce = true
             }
-        
+
 
             let hash = wallet?.unsubscribe(identifier, topic: topic, config: transactionConfig, error: &error)
             if (error != nil) {
@@ -381,7 +382,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
         walletMoneyQueue.async(execute: walletMoneyWorkItem!)
     }
-    
+
     private func getSubscribers(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let topic = args["topic"] as! String

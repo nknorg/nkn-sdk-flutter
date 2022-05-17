@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Modify wallet API
+
 ## 0.2.0
 
 * Add crypto module
