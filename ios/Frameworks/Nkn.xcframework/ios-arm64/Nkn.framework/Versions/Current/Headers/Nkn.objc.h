@@ -378,6 +378,8 @@ compatibility.
 @property (nonatomic) BOOL allowUnencrypted;
 @property (nonatomic) NknMessageConfig* _Nullable messageConfig;
 @property (nonatomic) NcpConfig* _Nullable sessionConfig;
+@property (nonatomic) NkngomobileResolverArray* _Nullable resolvers;
+@property (nonatomic) int32_t resolverDepth;
 /**
  * RPCGetConcurrency returns RPC concurrency. RPC prefix is added to avoid
 gomobile compile error.
@@ -1381,6 +1383,12 @@ FOUNDATION_EXPORT const int32_t NknTextType;
 /**
  * Error definitions.
  */
++ (NSError* _Nullable) errResolveLimit;
++ (void) setErrResolveLimit:(NSError* _Nullable)v;
+
+/**
+ * Error definitions.
+ */
 + (NSError* _Nullable) errUnencryptedMessage;
 + (void) setErrUnencryptedMessage:(NSError* _Nullable)v;
 
@@ -1654,6 +1662,15 @@ FOUNDATION_EXPORT NSString* _Nonnull NknPubKeyToWalletAddr(NSData* _Nullable pub
  * RandomBytes return cryptographically secure random bytes with given size.
  */
 FOUNDATION_EXPORT NSData* _Nullable NknRandomBytes(long numBytes, NSError* _Nullable* _Nullable error);
+
+// skipped function ResolveDest with unsupported parameter or return types
+
+
+// skipped function ResolveDestN with unsupported parameter or return types
+
+
+// skipped function ResolveDests with unsupported parameter or return types
+
 
 /**
  * SendRawTransaction wraps SendRawTransactionContext with background context.

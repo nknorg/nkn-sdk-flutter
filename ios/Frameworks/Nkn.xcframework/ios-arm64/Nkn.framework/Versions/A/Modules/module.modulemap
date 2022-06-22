@@ -5,6 +5,8 @@ framework module "Nkn" {
     header "Ncp.objc.h"
     header "Transaction.objc.h"
     header "Nkngomobile.objc.h"
+    header "Ethresolver.objc.h"
+    header "Dnsresolver.objc.h"
     header "Universe.objc.h"
     header "Nkn.h"
 

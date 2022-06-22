@@ -1,3 +1,7 @@
+## 0.3.0
+
+* Add Resolver
+
 ## 0.2.1
 
 * Modify wallet API

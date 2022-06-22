@@ -189,6 +189,9 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let identifier = args["identifier"] as? String ?? ""
         let seed = args["seed"] as? FlutterStandardTypedData
         let seedRpc = args["seedRpc"] as? [String]
+        let ethResolverRpcServer = args["ethResolverRpcServer"] as? String
+        let ethResolverContractAddress = args["ethResolverContractAddress"] as? String
+        let dnsResolverDnsServer = args["dnsResolverDnsServer"] as? String
 
         let config: NknClientConfig = NknClientConfig()
         if(seedRpc != nil){
@@ -199,6 +202,24 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
 
         var error: NSError?
+        
+        if (ethResolverRpcServer != nil && ethResolverContractAddress != nil) {
+            let ethResolverConfig: EthresolverConfig = EthresolverConfig()
+            ethResolverConfig.rpcServer = ethResolverRpcServer!
+            ethResolverConfig.contractAddress = ethResolverContractAddress!
+            config.resolvers = NkngomobileNewResolverArrayFromResolver(EthResolver(config: ethResolverConfig))
+        }
+        
+        if (dnsResolverDnsServer != nil) {
+            let dnsResolverConfig: DnsresolverConfig = DnsresolverConfig()
+            dnsResolverConfig.dnsServer = dnsResolverDnsServer!
+            if (config.resolvers == nil) {
+                config.resolvers = NkngomobileNewResolverArrayFromResolver(DnsResolver(config: dnsResolverConfig))
+            } else {
+                config.resolvers?.append(DnsResolver(config: dnsResolverConfig))
+            }
+        }
+        
         let account = NknNewAccount(seed?.data, &error)!
         if (error != nil) {
             self.resultError(result: result, error: error)

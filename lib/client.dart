@@ -53,12 +53,37 @@ class OnMessage {
   });
 }
 
+/// EthResolver Config
+class EthResolverConfig {
+  final String? rpcServer;
+  final String? contractAddress;
+
+  EthResolverConfig({this.rpcServer, this.contractAddress});
+}
+
+/// DnsResolver Config
+class DnsResolverConfig {
+  final String? dnsServer;
+
+  DnsResolverConfig({this.dnsServer});
+}
+
 /// Client config
 class ClientConfig {
   /// Seed RPC server address that client uses to find its node and make RPC requests (e.g. get subscribers).
   final List<String>? seedRPCServerAddr;
 
-  ClientConfig({this.seedRPCServerAddr});
+  /// EthResolver Config
+  final EthResolverConfig? ethResolverConfig;
+
+  /// DnsResolver Config
+  final DnsResolverConfig? dnsResolverConfig;
+
+  ClientConfig({
+    this.seedRPCServerAddr,
+    this.ethResolverConfig,
+    this.dnsResolverConfig,
+  });
 }
 
 /// Client sends and receives data between any NKN clients regardless their
@@ -130,6 +155,10 @@ class Client {
         'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true
             ? config?.seedRPCServerAddr
             : null,
+        'ethResolverRpcServer': config?.ethResolverConfig?.rpcServer,
+        'ethResolverContractAddress':
+            config?.ethResolverConfig?.contractAddress,
+        'dnsResolverDnsServer': config?.dnsResolverConfig?.dnsServer,
       });
       Client client = Client();
       client.address = resp['address'];

@@ -11,13 +11,57 @@
 #include "Universe.objc.h"
 
 
+@class NkngomobileResolverArray;
 @class NkngomobileStringArray;
 @class NkngomobileStringMap;
+@protocol NkngomobileResolver;
+@class NkngomobileResolver;
 @protocol NkngomobileStringMapFunc;
 @class NkngomobileStringMapFunc;
 
+@protocol NkngomobileResolver <NSObject>
+- (NSString* _Nonnull)resolve:(NSString* _Nullable)address error:(NSError* _Nullable* _Nullable)error;
+@end
+
 @protocol NkngomobileStringMapFunc <NSObject>
 - (BOOL)onVisit:(NSString* _Nullable)p0 p1:(NSString* _Nullable)p1;
+@end
+
+/**
+ * ResolverArray is a wrapper type for gomobile compatibility. ResolverArray is not
+protected by lock and should not be read and write at the same time.
+ */
+@interface NkngomobileResolverArray : NSObject <goSeqRefInterface> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+// skipped constructor ResolverArray.NewResolverArray with unsupported parameter or return types
+
+/**
+ * NewResolverArrayFromResolver creates a ResolverArray from a single string input.
+The input string will be split to string array by whitespace.
+ */
+- (nullable instancetype)initFromResolver:(id<NkngomobileResolver> _Nullable)e;
+/**
+ * Append adds an element to the string array.
+ */
+- (void)append:(id<NkngomobileResolver> _Nullable)a;
+// skipped method ResolverArray.Elems with unsupported parameter or return types
+
+/**
+ * Get gets an element to the string array.
+ */
+- (id<NkngomobileResolver> _Nullable)get:(long)i;
+/**
+ * Len returns the string array length.
+ */
+- (long)len;
+/**
+ * RandomElem returns a randome element from the string array. The random number
+is generated using math/rand and thus not cryptographically secure.
+ */
+- (id<NkngomobileResolver> _Nullable)randomElem;
 @end
 
 /**
@@ -117,6 +161,15 @@ FOUNDATION_EXPORT NkngomobileStringArray* _Nullable NkngomobileExcludeRoute(Nkng
 // skipped function IpToUint32 with unsupported parameter or return types
 
 
+// skipped function NewResolverArray with unsupported parameter or return types
+
+
+/**
+ * NewResolverArrayFromResolver creates a ResolverArray from a single string input.
+The input string will be split to string array by whitespace.
+ */
+FOUNDATION_EXPORT NkngomobileResolverArray* _Nullable NkngomobileNewResolverArrayFromResolver(id<NkngomobileResolver> _Nullable e);
+
 // skipped function NewStringArray with unsupported parameter or return types
 
 
@@ -137,7 +190,17 @@ FOUNDATION_EXPORT NkngomobileStringMap* _Nullable NkngomobileNewStringMapWithSiz
 // skipped function Uint32ToIP with unsupported parameter or return types
 
 
+@class NkngomobileResolver;
+
 @class NkngomobileStringMapFunc;
+
+@interface NkngomobileResolver : NSObject <goSeqRefInterface, NkngomobileResolver> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (NSString* _Nonnull)resolve:(NSString* _Nullable)address error:(NSError* _Nullable* _Nullable)error;
+@end
 
 /**
  * StringMapFunc is a wrapper type for gomobile compatibility.
