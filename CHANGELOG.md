@@ -1,3 +1,7 @@
+## 0.3.1
+
+* Upgrade Resolver
+
 ## 0.3.0
 
 * Add Resolver

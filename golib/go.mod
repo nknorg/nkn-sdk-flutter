@@ -3,8 +3,8 @@ module nkn
 go 1.18
 
 require (
-	github.com/nknorg/dns-resolver-go v0.0.0-20220617110154-2b893afc4661
-	github.com/nknorg/eth-resolver-go v0.0.0-20220615100206-57e765627a4a
+	github.com/nknorg/dns-resolver-go v0.0.0-20220623031624-1372bd227749
+	github.com/nknorg/eth-resolver-go v0.0.0-20220623031610-1babd7dc74b1
 	github.com/nknorg/nkn-sdk-go v1.4.2-0.20220622093511-79506bf196c7
 	github.com/nknorg/nkn/v2 v2.1.8
 	github.com/nknorg/nkngomobile v0.0.0-20220615081414-671ad1afdfa9

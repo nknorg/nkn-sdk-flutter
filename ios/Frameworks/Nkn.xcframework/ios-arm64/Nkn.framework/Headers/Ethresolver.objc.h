@@ -14,6 +14,9 @@
 @class EthresolverConfig;
 @class EthresolverResolver;
 
+/**
+ * Config is the Resolver configuration.
+ */
 @interface EthresolverConfig : NSObject <goSeqRefInterface> {
 }
 @property(strong, readonly) _Nonnull id _ref;
@@ -28,17 +31,35 @@
 @property (nonatomic) long dialTimeout;
 @end
 
+/**
+ * Resolver implement ETH resolver.
+ */
 @interface EthresolverResolver : NSObject <goSeqRefInterface> {
 }
 @property(strong, readonly) _Nonnull id _ref;
 
 - (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+/**
+ * NewResolver creates a Resolver. If config is nil, the default Resolver config will be used.
+ */
 - (nullable instancetype)init:(EthresolverConfig* _Nullable)config;
+/**
+ * Resolve resolves the address and returns the mapping address.
+ */
 - (NSString* _Nonnull)resolve:(NSString* _Nullable)address error:(NSError* _Nullable* _Nullable)error;
 @end
 
+/**
+ * CONTRACT_ADDRESS Contract address
+ */
 FOUNDATION_EXPORT NSString* _Nonnull const EthresolverCONTRACT_ADDRESS;
+/**
+ * PREFIX Protocol prefix
+ */
 FOUNDATION_EXPORT NSString* _Nonnull const EthresolverPREFIX;
+/**
+ * RPC_SERVER RPC server url
+ */
 FOUNDATION_EXPORT NSString* _Nonnull const EthresolverRPC_SERVER;
 
 @interface Ethresolver : NSObject
@@ -46,10 +67,21 @@ FOUNDATION_EXPORT NSString* _Nonnull const EthresolverRPC_SERVER;
 
 @end
 
+/**
+ * GetDefaultConfig returns the default Resolver config with nil pointer
+fields set to default.
+ */
 FOUNDATION_EXPORT EthresolverConfig* _Nullable EthresolverGetDefaultConfig(void);
 
+/**
+ * MergeConfig merges a given Resolver config with the default Resolver config
+recursively. Any non zero value fields will override the default config.
+ */
 FOUNDATION_EXPORT EthresolverConfig* _Nullable EthresolverMergeConfig(EthresolverConfig* _Nullable config, NSError* _Nullable* _Nullable error);
 
+/**
+ * NewResolver creates a Resolver. If config is nil, the default Resolver config will be used.
+ */
 FOUNDATION_EXPORT EthresolverResolver* _Nullable EthresolverNewResolver(EthresolverConfig* _Nullable config, NSError* _Nullable* _Nullable error);
 
 #endif
