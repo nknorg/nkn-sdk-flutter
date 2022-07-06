@@ -1,5 +1,9 @@
 ## 0.3.1
 
+* Modify Resolver config 
+
+## 0.3.1
+
 * Upgrade Resolver
 
 ## 0.3.0

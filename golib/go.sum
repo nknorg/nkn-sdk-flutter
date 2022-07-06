@@ -461,10 +461,10 @@ github.com/naoina/go-stringutil v0.1.0/go.mod h1:XJ2SJL9jCtBh+P9q5btrd/Ylo8XwT/h
 github.com/naoina/toml v0.1.2-0.20170918210437-9fafd6967416/go.mod h1:NBIhNtsFMo3G2szEBne+bO4gS192HuIYRqfvOWb4i1E=
 github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32/go.mod h1:9wM+0iRr9ahx58uYLpLIr5fm8diHn0JbqRycJi6w0Ms=
 github.com/nknorg/consequential v0.0.0-20190823093205-a45aff4a218a/go.mod h1:H7XeI/XOPpWVmqM+ScT75RLMn7jWnlZDwHRahSxNxo0=
-github.com/nknorg/dns-resolver-go v0.0.0-20220623031624-1372bd227749 h1:tzFTgi2flU0U6yEY8nGPFWFhBgos+w3Nuz9uWMR5eME=
-github.com/nknorg/dns-resolver-go v0.0.0-20220623031624-1372bd227749/go.mod h1:4kmAlcljv8giDwPUs2SoGNB+KKicismVnOrBy8SgEi8=
-github.com/nknorg/eth-resolver-go v0.0.0-20220623031610-1babd7dc74b1 h1:oRtAXlTcoiZygzdWFBcQfTRrY4FkRAomSsOHIPkWPco=
-github.com/nknorg/eth-resolver-go v0.0.0-20220623031610-1babd7dc74b1/go.mod h1:eJD3QXvMSs38ugYYAPrSFDXgJg4PNsSIeTefkWKxTQg=
+github.com/nknorg/dns-resolver-go v0.0.0-20220705102626-b041cd8d4a8e h1:GBCXdZ7X3+je1Kz8eq34Y61knTGDkLJqqZEOi87nO7w=
+github.com/nknorg/dns-resolver-go v0.0.0-20220705102626-b041cd8d4a8e/go.mod h1:4kmAlcljv8giDwPUs2SoGNB+KKicismVnOrBy8SgEi8=
+github.com/nknorg/eth-resolver-go v0.0.0-20220705093053-e6450052dee6 h1:I/siwcHa/XK3TkzmxXYFFruYi7hRMYcha5jGzc8Dj6g=
+github.com/nknorg/eth-resolver-go v0.0.0-20220705093053-e6450052dee6/go.mod h1:eJD3QXvMSs38ugYYAPrSFDXgJg4PNsSIeTefkWKxTQg=
 github.com/nknorg/go-nat v1.0.1/go.mod h1:dblX1Ac2j08rTUGs5CKCAfjHGN5eDFhbeqt2rccSP3Y=
 github.com/nknorg/ncp-go v1.0.3 h1:VMsOB8hZ7Tz/Y8oESzPvThxjXmLz8Ob7jKLloS8baUQ=
 github.com/nknorg/ncp-go v1.0.3/go.mod h1:ALtnk9lKKSwoOXatbfLLQvQWGkRnJomrmbTZjvg810E=

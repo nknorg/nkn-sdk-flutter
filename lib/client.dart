@@ -55,10 +55,11 @@ class OnMessage {
 
 /// EthResolver Config
 class EthResolverConfig {
+  final String? prefix;
   final String? rpcServer;
   final String? contractAddress;
 
-  EthResolverConfig({this.rpcServer, this.contractAddress});
+  EthResolverConfig({this.prefix, this.rpcServer, this.contractAddress});
 }
 
 /// DnsResolver Config
@@ -74,10 +75,10 @@ class ClientConfig {
   final List<String>? seedRPCServerAddr;
 
   /// EthResolver Config
-  final EthResolverConfig? ethResolverConfig;
+  final List<EthResolverConfig>? ethResolverConfig;
 
   /// DnsResolver Config
-  final DnsResolverConfig? dnsResolverConfig;
+  final List<DnsResolverConfig>? dnsResolverConfig;
 
   ClientConfig({
     this.seedRPCServerAddr,
@@ -148,6 +149,28 @@ class Client {
   /// be used.
   static Future<Client> create(Uint8List seed,
       {String identifier = '', ClientConfig? config}) async {
+    List<Map>? ethResolverConfigArray;
+    if (config?.ethResolverConfig != null) {
+      ethResolverConfigArray = <Map>[];
+      config?.ethResolverConfig?.forEach((item) {
+        ethResolverConfigArray?.add({
+          'prefix': item.prefix,
+          'contractAddress': item.contractAddress,
+          'rpcServer': item.rpcServer
+        });
+      });
+    }
+
+    List<Map>? dnsResolverConfigArray;
+    if (config?.dnsResolverConfig != null) {
+      dnsResolverConfigArray = <Map>[];
+      config?.dnsResolverConfig?.forEach((item) {
+        dnsResolverConfigArray?.add({
+          'dnsServer': item.dnsServer,
+        });
+      });
+    }
+
     try {
       final Map resp = await _methodChannel.invokeMethod('create', {
         'identifier': identifier,
@@ -155,10 +178,8 @@ class Client {
         'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true
             ? config?.seedRPCServerAddr
             : null,
-        'ethResolverRpcServer': config?.ethResolverConfig?.rpcServer,
-        'ethResolverContractAddress':
-            config?.ethResolverConfig?.contractAddress,
-        'dnsResolverDnsServer': config?.dnsResolverConfig?.dnsServer,
+        'ethResolverConfigArray': ethResolverConfigArray,
+        'dnsResolverConfigArray': dnsResolverConfigArray,
       });
       Client client = Client();
       client.address = resp['address'];
