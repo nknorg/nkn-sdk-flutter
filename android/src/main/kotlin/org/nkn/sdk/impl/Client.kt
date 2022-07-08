@@ -21,7 +21,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val EVENT_NAME = "org.nkn.sdk/client/event"
     }
 
-    private val numSubClients = 3L
+    private val NUM_SUB_CLIENTS = 3L
     private var clientMap: HashMap<String, MultiClient?> = hashMapOf()
 
     lateinit var methodChannel: MethodChannel
@@ -48,7 +48,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         eventSink = null
     }
 
-    private suspend fun createClient(account: Account, identifier: String, config: ClientConfig): MultiClient = withContext(Dispatchers.IO) {
+    private suspend fun createClient(account: Account, identifier: String, numSubClients: Long, config: ClientConfig): MultiClient = withContext(Dispatchers.IO) {
         val pubKey = Hex.toHexString(account.pubKey())
         val id = if (identifier.isEmpty()) pubKey else "${identifier}.${pubKey}"
         if (clientMap.containsKey(id)) {
@@ -72,7 +72,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         clientMap.remove(id)
     }
 
-    private suspend fun onConnect(client: MultiClient) = withContext(Dispatchers.IO) {
+    private suspend fun onConnect(client: MultiClient, numSubClients: Long) = withContext(Dispatchers.IO) {
         try {
             val node = client.onConnect.next()
             val rpcServers = ArrayList<String>()
@@ -133,6 +133,9 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             "create" -> {
                 create(call, result)
             }
+            "reconnect" -> {
+                reconnect(call, result)
+            }
             "close" -> {
                 close(call, result)
             }
@@ -173,6 +176,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         val identifier = call.argument<String>("identifier") ?: ""
         val seed = call.argument<ByteArray>("seed")
         val seedRpc = call.argument<ArrayList<String>?>("seedRpc")
+        val numSubClients = (call.argument<Int>("numSubClients") ?: 3).toLong()
         val ethResolverConfigArray = call.argument<ArrayList<Map<String, Any>>?>("ethResolverConfigArray")
         val dnsResolverConfigArray = call.argument<ArrayList<Map<String, Any>>?>("dnsResolverConfigArray")
 
@@ -215,7 +219,7 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = Nkn.newAccount(seed)
-                val client = createClient(account, identifier, config)
+                val client = createClient(account, identifier, numSubClients, config)
 
                 val data = hashMapOf(
                         "address" to client.address(),
@@ -224,11 +228,30 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 )
                 resultSuccess(result, data)
 
-                onConnect(client)
+                onConnect(client, numSubClients)
 
                 async(Dispatchers.IO) { onMessage(client) }
             } catch (e: Throwable) {
                 resultError(result, "", e.localizedMessage)
+            }
+        }
+    }
+
+    private fun reconnect(call: MethodCall, result: MethodChannel.Result) {
+        val _id = call.argument<String>("_id")!!
+
+        if (!clientMap.containsKey(_id)) {
+            result.error("", "client is null", "")
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val client = clientMap[_id]
+                client?.reconnect()
+                resultSuccess(result, null)
+            } catch (e: Throwable) {
+                eventSink?.error(_id, e.localizedMessage, "")
             }
         }
     }

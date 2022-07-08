@@ -1,3 +1,7 @@
+## 0.3.2
+
+* Add reconnect
+
 ## 0.3.1
 
 * Modify Resolver config 

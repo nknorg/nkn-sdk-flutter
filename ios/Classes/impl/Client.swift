@@ -23,11 +23,8 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
     let clientEventQueue = DispatchQueue(label: "org.nkn.sdk/client/event/queue", qos: .default, attributes: .concurrent)
     private var clientEventWorkItem: DispatchWorkItem?
     
-    let numSubClients = 3
+    let NUM_SUB_CLIENTS = 3
     var clientMap: [String:NknMultiClient] = [String:NknMultiClient]()
-    
-    let onMessageInterval = 100
-    var currentOnMessageCount = 0
     
     func install(binaryMessenger: FlutterBinaryMessenger) {
         self.methodChannel = FlutterMethodChannel(name: CHANNEL_NAME, binaryMessenger: binaryMessenger)
@@ -54,11 +51,12 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
     private func resultError(_ error: NSError?, code: String? = nil) -> FlutterError {
         return FlutterError(code: code ?? String(error?.code ?? 0), message: error?.localizedDescription, details: "")
     }
+    
     private func resultError(_ error: Error?, code: String? = "") -> FlutterError {
         return FlutterError(code: code ?? "", message: error?.localizedDescription, details: "")
     }
     
-    private func createClient(account: NknAccount, identifier: String = "", config: NknClientConfig) -> NknMultiClient? {
+    private func createClient(account: NknAccount, identifier: String = "", numSubClients: Int = 3, config: NknClientConfig) -> NknMultiClient? {
         let pubKey: String = account.pubKey()!.hexEncode
         let id = identifier.isEmpty ? pubKey : "\(identifier).\(pubKey)"
         
@@ -85,26 +83,19 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         clientMap.removeValue(forKey: id)
     }
     
-    private func addClientConnectQueue(client: NknMultiClient) {
-        clientConnectWorkItem = DispatchWorkItem {
-            self.onConnect(client: client)
-        }
-        clientConnectQueue.async(execute: clientConnectWorkItem!)
-    }
-    
-    private func onConnect(client: NknMultiClient) {
-        guard let node = client.onConnect?.next() else {
+    private func onConnect(client: NknMultiClient?, numSubClients: Int) {
+        guard let node = client?.onConnect?.next() else {
             return
         }
         
         var resp: [String: Any] = [String: Any]()
-        resp["_id"] = client.address()
+        resp["_id"] = client?.address()
         resp["event"] = "onConnect"
         resp["node"] = ["address": node.addr, "publicKey": node.pubKey]
-        resp["client"] = ["address": client.address()]
+        resp["client"] = ["address": client?.address()]
         var rpcServers = [String]()
         for i in 0...numSubClients {
-            let c = client.getClient(i)
+            let c = client?.getClient(i)
             let rpcNode = c?.getNode()
             var rpcAddr = rpcNode?.rpcAddr ?? ""
             if (rpcAddr.count > 0) {
@@ -116,14 +107,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
         resp["rpcServers"] = rpcServers
         NSLog("%@", resp)
-        eventSink?(resp)
-    }
-    
-    private func addMessageReceiveQueue(client: NknMultiClient) {
-        clientReceiveWorkItem = DispatchWorkItem {
-            self.onMessage(client: client)
-        }
-        clientReceiveQueue.async(execute: clientReceiveWorkItem!)
+        self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
     }
     
     private func onMessage(client: NknMultiClient) {
@@ -142,23 +126,16 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             "messageId": msg.messageID != nil ? FlutterStandardTypedData(bytes: msg.messageID!) : nil
         ]
         NSLog("%@", resp)
-        eventSink?(resp)
-        
-        // todo, queue
-        currentOnMessageCount += 1
-        if (currentOnMessageCount >= onMessageInterval) {
-            usleep(useconds_t(100 * 1000))
-            currentOnMessageCount = 0
-        }
-        
-        // loop
-        onMessage(client: client)
+        self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
+        self.onMessage(client: client)
     }
     
     private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method{
         case "create":
             create(call, result: result)
+        case "reconnect":
+            reconnect(call, result: result)
         case "close":
             close(call, result: result)
         case "sendText":
@@ -189,6 +166,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         let identifier = args["identifier"] as? String ?? ""
         let seed = args["seed"] as? FlutterStandardTypedData
         let seedRpc = args["seedRpc"] as? [String]
+        let numSubClients = args["numSubClients"] as? Int ?? NUM_SUB_CLIENTS
         let ethResolverConfigArray = args["ethResolverConfigArray"] as? [[String: Any]]
         let dnsResolverConfigArray = args["dnsResolverConfigArray"] as? [[String: Any]]
         
@@ -235,7 +213,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
         
         clientWorkItem = DispatchWorkItem {
-            guard let client = self.createClient(account: account, identifier: identifier, config: config) else {
+            guard let client = self.createClient(account: account, identifier: identifier, numSubClients: numSubClients, config: config) else {
                 self.resultError(result: result, code: "", message: "connect fail")
                 return
             }
@@ -246,8 +224,26 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             resp["seed"] = client.seed()
             self.resultSuccess(result: result, resp: resp)
             
-            self.onConnect(client: client)
+            self.onConnect(client: client, numSubClients: numSubClients)
             self.onMessage(client: client)
+        }
+        clientQueue.async(execute: clientWorkItem!)
+    }
+    
+    private func reconnect(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let _id = args["_id"] as! String
+        
+        guard (clientMap.keys.contains(_id)) else {
+            result(FlutterError(code: "", message: "client is null", details: ""))
+            return
+        }
+        guard let client = clientMap[_id] else{
+            return
+        }
+        clientWorkItem = DispatchWorkItem {
+            client.reconnect()
+            self.resultSuccess(result: result, resp: nil)
         }
         clientQueue.async(execute: clientWorkItem!)
     }
@@ -463,7 +459,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             do {
                 let res: NknSubscribers? = try client.getSubscribers(topic, offset: offset, limit: limit, meta: meta, txPool: txPool, subscriberHashPrefix: subscriberHashPrefix?.data)
                 let mapPro = MapProtocol()
-                res?.subscribers?.range(mapPro as! NkngomobileStringMapFuncProtocol)
+                res?.subscribers?.range(mapPro)
                 
                 self.resultSuccess(result: result, resp: mapPro.result)
                 return

@@ -9,9 +9,9 @@ import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import nkn.*
+import nkngomobile.StringArray
 import org.bouncycastle.util.encoders.Hex
 import org.nkn.sdk.IChannelHandler
-import nkngomobile.StringArray
 
 class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, ViewModel() {
     companion object {
@@ -107,7 +107,7 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 }
 
                 val resp = hashMapOf(
-                    "seedRPCServerAddrList" to seedRPCServerAddrs
+                        "seedRPCServerAddrList" to seedRPCServerAddrs
                 )
                 resultSuccess(result, resp)
                 return@launch
@@ -131,7 +131,6 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -139,7 +138,10 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 val wallet = Nkn.newWallet(account, config)
 
                 val resp = hashMapOf(
-                    "address" to wallet.address(), "keystore" to wallet.toJSON(), "publicKey" to wallet.pubKey(), "seed" to wallet.seed()
+                        "address" to wallet.address(),
+                        "keystore" to wallet.toJSON(),
+                        "publicKey" to wallet.pubKey(),
+                        "seed" to wallet.seed()
                 )
                 resultSuccess(result, resp)
                 return@launch
@@ -168,14 +170,16 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val wallet = Nkn.walletFromJSON(keystore, config)
 
                 val resp = hashMapOf(
-                    "address" to wallet.address(), "keystore" to wallet?.toJSON(), "publicKey" to wallet.pubKey(), "seed" to wallet.seed()
+                        "address" to wallet.address(),
+                        "keystore" to wallet?.toJSON(),
+                        "publicKey" to wallet.pubKey(),
+                        "seed" to wallet.seed()
                 )
                 resultSuccess(result, resp)
                 return@launch
@@ -208,7 +212,6 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -240,7 +243,6 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -358,7 +360,6 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -390,14 +391,13 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val subscription = Nkn.getSubscription(topic, subscriber, config)
                 val resp = hashMapOf(
-                    "meta" to subscription.meta,
-                    "expiresAt" to subscription.expiresAt
+                        "meta" to subscription.meta,
+                        "expiresAt" to subscription.expiresAt
                 )
 
                 resultSuccess(result, resp)
@@ -421,7 +421,6 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -446,7 +445,6 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -473,7 +471,6 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 config.seedRPCServerAddr.append(addr)
             }
         }
-        // config.rpcConcurrency = 4
 
         viewModelScope.launch(Dispatchers.IO) {
             try {

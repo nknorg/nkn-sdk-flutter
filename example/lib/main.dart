@@ -142,9 +142,11 @@ class _MyAppState extends State<MyApp> {
                       _client1 = await Client.create(
                         wallet.seed,
                         config: ClientConfig(
-                          dnsResolverConfig: DnsResolverConfig(
-                            dnsServer: '8.8.8.8:53',
-                          ),
+                          dnsResolverConfig: [
+                            DnsResolverConfig(
+                              dnsServer: '8.8.8.8:53',
+                            ),
+                          ],
                         ),
                       );
                       _client1.onConnect.listen((event) {

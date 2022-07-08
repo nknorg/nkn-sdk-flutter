@@ -148,7 +148,9 @@ class Client {
   /// config value will be used. If config is nil, the default client config will
   /// be used.
   static Future<Client> create(Uint8List seed,
-      {String identifier = '', ClientConfig? config}) async {
+      {String identifier = '',
+      int? numSubClients,
+      ClientConfig? config}) async {
     List<Map>? ethResolverConfigArray;
     if (config?.ethResolverConfig != null) {
       ethResolverConfigArray = <Map>[];
@@ -175,6 +177,7 @@ class Client {
       final Map resp = await _methodChannel.invokeMethod('create', {
         'identifier': identifier,
         'seed': seed,
+        'numSubClients': numSubClients,
         'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true
             ? config?.seedRPCServerAddr
             : null,
@@ -220,6 +223,14 @@ class Client {
     } catch (e) {
       throw e;
     }
+  }
+
+  /// [reconnect] reconnect the multiclient
+  Future<void> reconnect() async {
+    if (!(this.address.isNotEmpty == true)) {
+      return;
+    }
+    await _methodChannel.invokeMethod('reconnect', {'_id': this.address});
   }
 
   /// [close] closes the multiclient, including all clients it created and all

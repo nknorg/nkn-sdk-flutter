@@ -198,7 +198,6 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 config.seedRPCServerAddr?.append(v)
             }
         }
-        // config.rpcConcurrency = 4
 
         walletMoneyWorkItem = DispatchWorkItem {
             var error: NSError?
@@ -239,7 +238,6 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 config.seedRPCServerAddr?.append(v)
             }
         }
-        // config.rpcConcurrency = 4
 
         walletMoneyWorkItem = DispatchWorkItem {
             var error: NSError?
@@ -411,7 +409,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             }
 
             let mapPro = MapProtocol()
-            res?.subscribers?.range(mapPro as! NkngomobileStringMapFuncProtocol)
+            res?.subscribers?.range(mapPro)
 
             self.resultSuccess(result: result, resp: mapPro.result)
             return
