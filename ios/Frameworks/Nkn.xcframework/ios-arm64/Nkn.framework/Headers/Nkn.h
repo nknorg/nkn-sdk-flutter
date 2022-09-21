@@ -1,7 +1,8 @@
 
 // Objective-C API for talking to the following Go packages
 //
-//	nkn/crypto
+//	nkngolib
+//	nkngolib/crypto
 //	github.com/nknorg/nkn-sdk-go
 //	github.com/nknorg/ncp-go
 //	github.com/nknorg/nkn/v2/transaction
@@ -13,6 +14,7 @@
 #ifndef __Nkn_FRAMEWORK_H__
 #define __Nkn_FRAMEWORK_H__
 
+#include "Nkngolib.objc.h"
 #include "Crypto.objc.h"
 #include "Nkn.objc.h"
 #include "Ncp.objc.h"

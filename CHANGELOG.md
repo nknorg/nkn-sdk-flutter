@@ -1,3 +1,11 @@
+## 0.3.4
+
+Add dial context in client configure
+
+## 0.3.3
+
+Modify Resolver config
+
 ## 0.3.2
 
 * Add reconnect

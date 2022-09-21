@@ -1,5 +1,6 @@
 framework module "Nkn" {
 	header "ref.h"
+    header "Nkngolib.objc.h"
     header "Crypto.objc.h"
     header "Nkn.objc.h"
     header "Ncp.objc.h"

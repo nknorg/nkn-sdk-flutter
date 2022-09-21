@@ -149,17 +149,27 @@ class _MyAppState extends State<MyApp> {
                           ],
                         ),
                       );
+                      print('-------------_client1----------');
+                      print(_client1.address);
                       _client1.onConnect.listen((event) {
                         print('------onConnect1-----');
                         print(event.node);
                       });
+
+                      Map dic = Map();
                       _client1.onMessage.listen((event) {
                         print('------onMessage1-----');
-                        print(event.type);
-                        print(event.encrypted);
-                        print(event.messageId);
+                        if (dic[event.src] == null) {
+                          dic[event.src] = 1;
+                        } else {
+                          dic[event.src] += 1;
+                        }
+                        print(dic[event.src]);
+                        // print(event.type);
+                        // print(event.encrypted);
+                        // print(event.messageId);
                         print(event.data);
-                        print(event.src);
+                        // print(event.src);
                       });
                     },
                     child: Text('create'),

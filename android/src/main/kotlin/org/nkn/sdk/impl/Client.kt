@@ -9,6 +9,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.*
 import nkn.*
+import nkngolib.Nkngolib
 import nkngomobile.Nkngomobile.newStringArrayFromString
 import org.bouncycastle.util.encoders.Hex
 import org.nkn.sdk.IChannelHandler
@@ -219,8 +220,15 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = Nkn.newAccount(seed)
-                val client = createClient(account, identifier, numSubClients, config)
-
+                var client: MultiClient? = null
+                try {
+                    client = createClient(account, identifier, numSubClients, config)
+                } catch (e: Throwable) {
+                }
+                if (client == null) {
+                    Nkngolib.addClientConfigWithDialContext(config)
+                    client = createClient(account, identifier, numSubClients, config)
+                }
                 val data = hashMapOf(
                         "address" to client.address(),
                         "publicKey" to client.pubKey(),

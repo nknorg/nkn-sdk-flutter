@@ -156,9 +156,13 @@ will be used.
 /**
  * Address returns the NKN client address of the client. Client address is in
 the form of
-  identifier.pubKeyHex
+
+	identifier.pubKeyHex
+
 if identifier is not an empty string, or
-  pubKeyHex
+
+	pubKeyHex
+
 if identifier is an empty string.
 
 Note that client address is different from wallet address using the same key
@@ -378,6 +382,10 @@ compatibility.
 @property (nonatomic) BOOL allowUnencrypted;
 @property (nonatomic) NknMessageConfig* _Nullable messageConfig;
 @property (nonatomic) NcpConfig* _Nullable sessionConfig;
+// skipped field ClientConfig.HttpDialContext with unsupported type: func(ctx context.Context, network string, addr string) (net.Conn, error)
+
+// skipped field ClientConfig.WsDialContext with unsupported type: func(ctx context.Context, network string, addr string) (net.Conn, error)
+
 @property (nonatomic) NkngomobileResolverArray* _Nullable resolvers;
 @property (nonatomic) int32_t resolverDepth;
 /**
@@ -385,6 +393,8 @@ compatibility.
 gomobile compile error.
  */
 - (int32_t)rpcGetConcurrency;
+// skipped method ClientConfig.RPCGetHttpDialContext with unsupported parameter or return types
+
 /**
  * RPCGetRPCTimeout returns RPC timeout in millisecond. RPC prefix is added to
 avoid gomobile compile error.
@@ -906,11 +916,15 @@ function.
 @property (nonatomic) NkngomobileStringArray* _Nullable seedRPCServerAddr;
 @property (nonatomic) int32_t rpcTimeout;
 @property (nonatomic) int32_t rpcConcurrency;
+// skipped field RPCConfig.HttpDialContext with unsupported type: func(ctx context.Context, network string, addr string) (net.Conn, error)
+
 /**
  * RPCGetConcurrency returns RPC concurrency. RPC prefix is added to avoid
 gomobile compile error.
  */
 - (int32_t)rpcGetConcurrency;
+// skipped method RPCConfig.RPCGetHttpDialContext with unsupported parameter or return types
+
 /**
  * RPCGetRPCTimeout returns RPC timeout in millisecond. RPC prefix is added to
 avoid gomobile compile error.
@@ -1175,11 +1189,15 @@ this wallet.
 @property (nonatomic) NSData* _Nullable iv;
 @property (nonatomic) NSData* _Nullable masterKey;
 @property (nonatomic) NknScryptConfig* _Nullable scryptConfig;
+// skipped field WalletConfig.HttpDialContext with unsupported type: func(ctx context.Context, network string, addr string) (net.Conn, error)
+
 /**
  * RPCGetConcurrency returns RPC concurrency. RPC prefix is added to avoid
 gomobile compile error.
  */
 - (int32_t)rpcGetConcurrency;
+// skipped method WalletConfig.RPCGetHttpDialContext with unsupported parameter or return types
+
 /**
  * RPCGetRPCTimeout returns RPC timeout in millisecond. RPC prefix is added to
 avoid gomobile compile error.

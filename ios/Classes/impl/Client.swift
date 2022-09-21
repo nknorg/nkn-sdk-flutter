@@ -110,6 +110,13 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
     }
     
+    private func addMessageReceiveQueue(client: NknMultiClient) {
+        clientReceiveWorkItem = DispatchWorkItem {
+            self.onMessage(client: client)
+        }
+        clientReceiveQueue.async(execute: clientReceiveWorkItem!)
+    }
+    
     private func onMessage(client: NknMultiClient) {
         guard let msg = client.onMessage?.next() else {
             return
@@ -127,7 +134,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         ]
         NSLog("%@", resp)
         self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
-        self.onMessage(client: client)
+        self.addMessageReceiveQueue(client: client)
     }
     
     private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -213,19 +220,25 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         }
         
         clientWorkItem = DispatchWorkItem {
-            guard let client = self.createClient(account: account, identifier: identifier, numSubClients: numSubClients, config: config) else {
-                self.resultError(result: result, code: "", message: "connect fail")
-                return
+            var client = self.createClient(account: account, identifier: identifier, numSubClients: numSubClients, config: config)
+            if (client == nil) {
+                NkngolibAddClientConfigWithDialContext(config)
+                client = self.createClient(account: account, identifier: identifier, numSubClients: numSubClients, config: config)
+                if (client == nil) {
+                    self.resultError(result: result, code: "", message: "connect fail")
+                    return
+                }
             }
             
+            
             var resp:[String:Any] = [String:Any]()
-            resp["address"] = client.address()
-            resp["publicKey"] = client.pubKey()
-            resp["seed"] = client.seed()
+            resp["address"] = client!.address()
+            resp["publicKey"] = client!.pubKey()
+            resp["seed"] = client!.seed()
             self.resultSuccess(result: result, resp: resp)
             
             self.onConnect(client: client, numSubClients: numSubClients)
-            self.onMessage(client: client)
+            self.onMessage(client: client!)
         }
         clientQueue.async(execute: clientWorkItem!)
     }
