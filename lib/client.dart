@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:nkn_sdk_flutter/utils/hex.dart';
@@ -29,20 +28,26 @@ class OnConnect {
 
 /// Event emitting channel when client receives a message (not including reply or ACK).
 class OnMessage {
+  /// Client ID
+  String? _id;
+
   /// Message ID.
   Uint8List messageId;
 
   /// Sender's NKN client address
-  String? src;
+  String src;
 
   /// Message data.
-  String? data;
+  String data;
 
   /// Message data type.
-  int? type;
+  int type;
 
   /// Whether message is encrypted.
-  bool? encrypted;
+  bool encrypted;
+
+  /// Indicating no reply or ACK should be sent
+  bool noReply;
 
   OnMessage({
     required this.messageId,
@@ -50,7 +55,23 @@ class OnMessage {
     required this.src,
     required this.type,
     required this.encrypted,
+    required this.noReply,
   });
+
+  Future<void> reply(String data, {int maxHoldingSeconds = 0}) async {
+    try {
+      await Client._methodChannel.invokeMethod('replyText', {
+        '_id': this._id,
+        'messageId': this.messageId,
+        'dest': this.src,
+        'data': data,
+        'encrypted': this.encrypted,
+        'maxHoldingSeconds': maxHoldingSeconds,
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
 }
 
 /// EthResolver Config
@@ -91,10 +112,8 @@ class ClientConfig {
 /// network condition without setting up a server or relying on any third party
 /// services. Data are end to end encrypted by default.
 class Client {
-  static const MethodChannel _methodChannel =
-      MethodChannel('org.nkn.sdk/client');
-  static const EventChannel _eventChannel =
-      EventChannel('org.nkn.sdk/client/event');
+  static const MethodChannel _methodChannel = MethodChannel('org.nkn.sdk/client');
+  static const EventChannel _eventChannel = EventChannel('org.nkn.sdk/client/event');
 
   static Stream? _stream;
 
@@ -114,24 +133,19 @@ class Client {
 
   ClientConfig? clientConfig;
 
-  StreamController<OnConnect> _onConnectStreamController =
-      StreamController<OnConnect>.broadcast();
+  StreamController<OnConnect> _onConnectStreamController = StreamController<OnConnect>.broadcast();
 
-  StreamSink<OnConnect> get _onConnectStreamSink =>
-      _onConnectStreamController.sink;
+  StreamSink<OnConnect> get _onConnectStreamSink => _onConnectStreamController.sink;
 
   Stream<OnConnect> get onConnect => _onConnectStreamController.stream;
 
-  StreamController<OnMessage> _onMessageStreamController =
-      StreamController<OnMessage>.broadcast();
+  StreamController<OnMessage> _onMessageStreamController = StreamController<OnMessage>.broadcast();
 
-  StreamSink<OnMessage> get _onMessageStreamSink =>
-      _onMessageStreamController.sink;
+  StreamSink<OnMessage> get _onMessageStreamSink => _onMessageStreamController.sink;
 
   Stream<OnMessage> get onMessage => _onMessageStreamController.stream;
 
-  StreamController<dynamic> _onErrorStreamController =
-      StreamController<dynamic>.broadcast();
+  StreamController<dynamic> _onErrorStreamController = StreamController<dynamic>.broadcast();
 
   StreamSink<dynamic> get _onErrorStreamSink => _onErrorStreamController.sink;
 
@@ -147,19 +161,12 @@ class Client {
   /// clients created. For any zero value field in config, the default client
   /// config value will be used. If config is nil, the default client config will
   /// be used.
-  static Future<Client> create(Uint8List seed,
-      {String identifier = '',
-      int? numSubClients,
-      ClientConfig? config}) async {
+  static Future<Client> create(Uint8List seed, {String identifier = '', int? numSubClients, ClientConfig? config}) async {
     List<Map>? ethResolverConfigArray;
     if (config?.ethResolverConfig != null) {
       ethResolverConfigArray = <Map>[];
       config?.ethResolverConfig?.forEach((item) {
-        ethResolverConfigArray?.add({
-          'prefix': item.prefix,
-          'contractAddress': item.contractAddress,
-          'rpcServer': item.rpcServer
-        });
+        ethResolverConfigArray?.add({'prefix': item.prefix, 'contractAddress': item.contractAddress, 'rpcServer': item.rpcServer});
       });
     }
 
@@ -179,9 +186,7 @@ class Client {
         'identifier': identifier,
         'seed': seed,
         'numSubClients': numSubClients,
-        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true
-            ? config?.seedRPCServerAddr
-            : null,
+        'seedRpc': config?.seedRPCServerAddr?.isNotEmpty == true ? config?.seedRPCServerAddr : null,
         'ethResolverConfigArray': ethResolverConfigArray,
         'dnsResolverConfigArray': dnsResolverConfigArray,
       });
@@ -189,26 +194,19 @@ class Client {
       client.publicKey = resp['publicKey'];
       client.seed = resp['seed'];
 
-      client.eventChannelStreamSubscription =
-          _stream!.where((res) => res['_id'] == client.address).listen((res) {
+      client.eventChannelStreamSubscription = _stream!.where((res) => res['_id'] == client.address).listen((res) {
         if (res['_id'] != client.address) {
           return;
         }
         switch (res['event']) {
           case 'onConnect':
-            client._onConnectStreamSink.add(OnConnect(
-                node: res['node'],
-                rpcServers: res['rpcServers']?.cast<String>()));
+            client._onConnectStreamSink.add(OnConnect(node: res['node'], rpcServers: res['rpcServers']?.cast<String>()));
             break;
           case 'onMessage':
             Map data = res['data'];
-            client._onMessageStreamSink.add(OnMessage(
-              src: data['src'],
-              type: data['type'],
-              messageId: data['messageId'],
-              data: data['data'],
-              encrypted: data['encrypted'],
-            ));
+            var onMsg = OnMessage(src: data['src'], type: data['type'], messageId: data['messageId'], data: data['data'], encrypted: data['encrypted'], noReply: data['noReply']);
+            onMsg._id = res['_id'];
+            client._onMessageStreamSink.add(onMsg);
             break;
           default:
             break;
@@ -250,8 +248,7 @@ class Client {
   /// [sendText] sends bytes or string data to one or multiple destinations with an
   /// optional config. Returned [OnMessage] will emit if a reply or ACK for
   /// this message is received.
-  Future<OnMessage> sendText(List<String> dests, String data,
-      {int maxHoldingSeconds = 8640000, noReply = true}) async {
+  Future<OnMessage> sendText(List<String> dests, String data, {int maxHoldingSeconds = 8640000, noReply = true}) async {
     try {
       final Map resp = await _methodChannel.invokeMethod('sendText', {
         '_id': this.address,
@@ -266,6 +263,7 @@ class Client {
         type: resp['type'],
         encrypted: resp['encrypted'],
         src: resp['src'],
+        noReply: resp['noReply'],
       );
       return message;
     } catch (e) {
@@ -275,11 +273,7 @@ class Client {
 
   /// [publishText] sends bytes or string data to all subscribers of a topic with an
   /// optional config.
-  Future<OnMessage> publishText(String topic, String data,
-      {int maxHoldingSeconds = 8640000,
-      bool txPool = false,
-      int offset = 0,
-      int limit = 1000}) async {
+  Future<OnMessage> publishText(String topic, String data, {int maxHoldingSeconds = 8640000, bool txPool = false, int offset = 0, int limit = 1000}) async {
     try {
       final Map resp = await _methodChannel.invokeMethod('publishText', {
         '_id': this.address,
@@ -296,6 +290,7 @@ class Client {
         type: resp['type'],
         encrypted: resp['encrypted'],
         src: resp['src'],
+        noReply: resp['noReply'],
       );
       return message;
     } catch (e) {
@@ -362,8 +357,7 @@ class Client {
   /// prefix byte will reduce result count to about 1/256, and also reduce response
   /// time to about 1/256 if there are a lot of subscribers. This is a good way to
   /// sample subscribers randomly with low cost.
-  Future<int> getSubscribersCount(
-      {required String topic, Uint8List? subscriberHashPrefix}) async {
+  Future<int> getSubscribersCount({required String topic, Uint8List? subscriberHashPrefix}) async {
     try {
       int count = await _methodChannel.invokeMethod('getSubscribersCount', {
         '_id': this.address,
@@ -377,8 +371,7 @@ class Client {
   }
 
   /// [getSubscription] RPC gets the subscription details of a subscriber in a topic.
-  Future<Map<String, dynamic>?> getSubscription(
-      {required String topic, required String subscriber}) async {
+  Future<Map<String, dynamic>?> getSubscription({required String topic, required String subscriber}) async {
     try {
       Map? resp = await _methodChannel.invokeMethod('getSubscription', {
         '_id': this.address,
@@ -430,8 +423,7 @@ class Client {
   /// [getHeight] RPC returns the latest block height.
   Future<int?> getHeight() async {
     try {
-      int? resp =
-          await _methodChannel.invokeMethod('getHeight', {'_id': this.address});
+      int? resp = await _methodChannel.invokeMethod('getHeight', {'_id': this.address});
       return resp;
     } catch (e) {
       throw e;
@@ -443,8 +435,7 @@ class Client {
   /// transactions in txPool are also counted.
   Future<int?> getNonce({bool txPool = true}) async {
     try {
-      String? walletAddr =
-          await Wallet.pubKeyToWalletAddr(hexEncode(this.publicKey));
+      String? walletAddr = await Wallet.pubKeyToWalletAddr(hexEncode(this.publicKey));
       int? resp = await _methodChannel.invokeMethod('getNonce', {
         '_id': this.address,
         'address': walletAddr,

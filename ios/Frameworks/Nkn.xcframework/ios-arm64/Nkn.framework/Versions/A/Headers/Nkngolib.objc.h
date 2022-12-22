@@ -11,10 +11,14 @@
 #include "Universe.objc.h"
 
 #include "Nkn.objc.h"
+#include "Nkngomobile.objc.h"
 #include "Dnsresolver.objc.h"
 #include "Ethresolver.objc.h"
-#include "Nkngomobile.objc.h"
 
 FOUNDATION_EXPORT void NkngolibAddClientConfigWithDialContext(NknClientConfig* _Nullable config);
+
+FOUNDATION_EXPORT NkngomobileStringArray* _Nullable NkngolibMeasureSeedRPCServer(NkngomobileStringArray* _Nullable seedRPCList, int32_t timeout, NSError* _Nullable* _Nullable error);
+
+FOUNDATION_EXPORT BOOL NkngolibReply(NknMultiClient* _Nullable c, NknMessage* _Nullable msg, NSString* _Nullable data, BOOL encrypted, int32_t maxHoldingSeconds, NSError* _Nullable* _Nullable error);
 
 #endif

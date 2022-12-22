@@ -130,7 +130,8 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             "data": String(data: msg.data!, encoding: String.Encoding.utf8)!,
             "type": msg.type,
             "encrypted": msg.encrypted,
-            "messageId": msg.messageID != nil ? FlutterStandardTypedData(bytes: msg.messageID!) : nil
+            "messageId": msg.messageID != nil ? FlutterStandardTypedData(bytes: msg.messageID!) : nil,
+            "noReply": msg.noReply
         ]
         NSLog("%@", resp)
         self.eventSinkSuccess(eventSink: eventSink!, resp: resp)
@@ -145,6 +146,8 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
             reconnect(call, result: result)
         case "close":
             close(call, result: result)
+        case "replyText":
+            replyText(call, result: result)
         case "sendText":
             sendText(call, result: result)
         case "publishText":
@@ -273,6 +276,41 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         clientQueue.async(execute: clientWorkItem!)
     }
     
+    private func replyText(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let _id = args["_id"] as! String
+        let messageId = args["messageId"] as? FlutterStandardTypedData
+        let dest = args["dest"] as! String
+        let data = args["data"] as! String
+        let encrypted = args["encrypted"] as? Bool ?? true
+        let maxHoldingSeconds = args["maxHoldingSeconds"] as? Int32 ?? 0
+        
+        guard (clientMap.keys.contains(_id)) else {
+            result(FlutterError(code: "", message: "client is null", details: ""))
+            return
+        }
+        guard let client = clientMap[_id] else{
+            return
+        }
+        
+        let msg = NknMessage()
+        msg.messageID = messageId?.data
+        msg.src = dest
+        
+        clientSendWorkItem = DispatchWorkItem {
+            var error:NSError?
+            
+            NkngolibReply(client, msg, data, encrypted, maxHoldingSeconds, &error)
+            if(error != nil) {
+                self.resultError(result: result, error: error, code: _id)
+                return
+            }
+            
+        }
+        clientSendQueue.async(execute: clientSendWorkItem!)
+        
+    }
+    
     private func sendText(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
         let _id = args["_id"] as! String
@@ -317,6 +355,7 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                     resp["type"] = msg.type
                     resp["encrypted"] = msg.encrypted
                     resp["messageId"] = msg.messageID != nil ? FlutterStandardTypedData(bytes: msg.messageID!) : nil
+                    resp["noReply"] = msg.noReply
                     self.resultSuccess(result: result, resp: resp)
                     return
                 } else {

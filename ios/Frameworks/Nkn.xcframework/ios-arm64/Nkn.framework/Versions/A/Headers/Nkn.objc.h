@@ -294,6 +294,8 @@ client/wallet with the same key pair and should be kept secret and safe.
 compatibility.
  */
 - (NknOnMessage* _Nullable)sendBinary:(NkngomobileStringArray* _Nullable)dests data:(NSData* _Nullable)data config:(NknMessageConfig* _Nullable)config error:(NSError* _Nullable* _Nullable)error;
+// skipped method Client.SendPayload with unsupported parameter or return types
+
 /**
  * SendRawTransaction wraps SendRawTransactionContext with background context.
  */
@@ -509,9 +511,13 @@ ErrClosed.
 /**
  * Address returns the NKN client address of the multiclient. Client address is
 in the form of
-  identifier.pubKeyHex
+
+	identifier.pubKeyHex
+
 if identifier is not an empty string, or
-  pubKeyHex
+
+	pubKeyHex
+
 if identifier is an empty string.
 
 Note that client address is different from wallet address using the same key
@@ -676,6 +682,8 @@ compatibility.
 for gomobile compatibility.
  */
 - (NknOnMessage* _Nullable)sendBinaryWithClient:(long)clientID dests:(NkngomobileStringArray* _Nullable)dests data:(NSData* _Nullable)data config:(NknMessageConfig* _Nullable)config error:(NSError* _Nullable* _Nullable)error;
+// skipped method MultiClient.SendPayload with unsupported parameter or return types
+
 /**
  * SendRawTransaction wraps SendRawTransactionContext with background context.
  */
@@ -1564,11 +1572,8 @@ FOUNDATION_EXPORT NknNode* _Nullable NknGetWssAddr(NSString* _Nullable clientAdd
 // skipped function GetWssAddrContext with unsupported parameter or return types
 
 
-/**
- * MeasureSeedRPCServer wraps MeasureSeedRPCServerContext with background
-context.
- */
-FOUNDATION_EXPORT NkngomobileStringArray* _Nullable NknMeasureSeedRPCServer(NkngomobileStringArray* _Nullable seedRPCList, int32_t timeout, NSError* _Nullable* _Nullable error);
+// skipped function MeasureSeedRPCServer with unsupported parameter or return types
+
 
 // skipped function MeasureSeedRPCServerContext with unsupported parameter or return types
 
@@ -1657,6 +1662,9 @@ FOUNDATION_EXPORT NknOnError* _Nullable NknNewOnError(long size, id<NknOnErrorFu
 function.
  */
 FOUNDATION_EXPORT NknOnMessage* _Nullable NknNewOnMessage(long size, id<NknOnMessageFunc> _Nullable cb);
+
+// skipped function NewReplyPayload with unsupported parameter or return types
+
 
 /**
  * NewWallet creates a wallet from an account and an optional config. For any

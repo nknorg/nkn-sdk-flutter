@@ -77,7 +77,7 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             for (_, v) in seedRpc!.enumerated() {
                 seedRPCServerAddr?.append(v)
             }
-            seedRPCServerAddr = NknMeasureSeedRPCServer(seedRPCServerAddr as! NkngomobileStringArray, timeout, nil)
+            seedRPCServerAddr = NkngolibMeasureSeedRPCServer(seedRPCServerAddr as! NkngomobileStringArray, timeout, nil)
 
             var seedRPCServerAddrs = [String]()
             let elements = seedRPCServerAddr?.join(",").split(separator: ",")

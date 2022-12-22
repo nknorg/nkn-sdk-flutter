@@ -170,6 +170,16 @@ class _MyAppState extends State<MyApp> {
                         // print(event.messageId);
                         print(event.data);
                         // print(event.src);
+                        print(event.noReply);
+                        if (!event.noReply) {
+                          event.reply(jsonEncode({
+                            'id': DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
+                            'contentType': 'text',
+                            'content': 'reply'
+                          }));
+                        }
                       });
                     },
                     child: Text('create'),
@@ -188,7 +198,7 @@ class _MyAppState extends State<MyApp> {
                         'content': 'hi'
                       }));
                       var res = await _client1.sendText(
-                          ['DNS:nameservicetest.nkn.org'],
+                          [_client2.address],
                           jsonEncode({
                             'id': DateTime.now()
                                 .millisecondsSinceEpoch
@@ -301,8 +311,8 @@ class _MyAppState extends State<MyApp> {
                     onPressed: () async {
                       var res = await _client2.sendText([
                         _client1.address
-                      ], jsonEncode({'contentType': 'text', 'content': 'hi2'}));
-                      print(res);
+                      ], jsonEncode({'contentType': 'text', 'content': 'hi2'}),noReply: false);
+                      print(res.data);
                     },
                     child: Text('sendText'),
                   ),
