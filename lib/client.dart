@@ -259,11 +259,11 @@ class Client {
       });
       OnMessage message = OnMessage(
         messageId: resp['messageId'],
-        data: resp['data'],
-        type: resp['type'],
-        encrypted: resp['encrypted'],
-        src: resp['src'],
-        noReply: resp['noReply'],
+        data: resp['data']??'',
+        type: resp['type']??0,
+        encrypted: resp['encrypted']??false,
+        src: resp['src']??"",
+        noReply: resp['noReply']??true,
       );
       return message;
     } catch (e) {
