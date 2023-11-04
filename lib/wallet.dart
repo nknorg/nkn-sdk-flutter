@@ -68,7 +68,7 @@ class Wallet {
       });
       return result;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -95,7 +95,7 @@ class Wallet {
       wallet.publicKey = data['publicKey'];
       return wallet;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -118,7 +118,7 @@ class Wallet {
       wallet.publicKey = data['publicKey'];
       return wallet;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -133,7 +133,7 @@ class Wallet {
             : [DEFAULT_SEED_RPC_SERVER],
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -160,7 +160,7 @@ class Wallet {
             this.walletConfig.seedRPCServerAddr ?? [DEFAULT_SEED_RPC_SERVER],
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -191,7 +191,7 @@ class Wallet {
             this.walletConfig.seedRPCServerAddr ?? [DEFAULT_SEED_RPC_SERVER],
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -215,7 +215,7 @@ class Wallet {
             this.walletConfig.seedRPCServerAddr ?? [DEFAULT_SEED_RPC_SERVER],
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -250,7 +250,7 @@ class Wallet {
       });
       return count;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -271,7 +271,7 @@ class Wallet {
       }
       return Map<String, dynamic>.from(resp);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -307,7 +307,7 @@ class Wallet {
       }
       return Map<String, dynamic>.from(resp);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -320,7 +320,7 @@ class Wallet {
             : [DEFAULT_SEED_RPC_SERVER],
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -336,7 +336,7 @@ class Wallet {
             this.walletConfig.seedRPCServerAddr ?? [DEFAULT_SEED_RPC_SERVER],
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -352,7 +352,7 @@ class Wallet {
             : [DEFAULT_SEED_RPC_SERVER],
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 }

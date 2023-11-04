@@ -1,3 +1,8 @@
+## 0.4.0
+
+* Update dependencies
+* Fix iOS eventSink crash
+
 ## 0.3.5
 
 Add reply

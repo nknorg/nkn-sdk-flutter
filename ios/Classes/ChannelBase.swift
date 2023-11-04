@@ -21,24 +21,36 @@ class ChannelBase: NSObject {
         }
     }
     
-    func eventSinkSuccess(eventSink: @escaping FlutterEventSink, resp: Any?) {
+    func eventSinkSuccess(eventSink: FlutterEventSink?, resp: Any?) {
+        guard let es = eventSink else {
+            return
+        }
         DispatchQueue.main.async {
-            eventSink(resp)
+            es(resp)
         }
     }
-    func eventSinkError(eventSink: @escaping FlutterEventSink, error: NSError?, code: String? = "") {
+    func eventSinkError(eventSink: FlutterEventSink?, error: NSError?, code: String? = "") {
+        guard let es = eventSink else {
+            return
+        }
         DispatchQueue.main.async {
-            eventSink(FlutterError(code: code ?? "", message: error?.localizedDescription, details: ""))
+            es(FlutterError(code: code ?? "", message: error?.localizedDescription, details: ""))
         }
     }
-    func eventSinkError(eventSink: @escaping FlutterEventSink, error: Error?, code: String? = "") {
+    func eventSinkError(eventSink: FlutterEventSink?, error: Error?, code: String? = "") {
+        guard let es = eventSink else {
+            return
+        }
         DispatchQueue.main.async {
-            eventSink(FlutterError(code: code ?? "", message: error?.localizedDescription, details: ""))
+            es(FlutterError(code: code ?? "", message: error?.localizedDescription, details: ""))
         }
     }
-    func eventSinkError(eventSink: @escaping FlutterEventSink, code: String? = "", message: String? = "", details: String? = "") {
+    func eventSinkError(eventSink: FlutterEventSink?, code: String? = "", message: String? = "", details: String? = "") {
+        guard let es = eventSink else {
+            return
+        }
         DispatchQueue.main.async {
-            eventSink(FlutterError(code: code ?? "", message: message, details: details))
+            es(FlutterError(code: code ?? "", message: message, details: details))
         }
     }
 }

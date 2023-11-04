@@ -69,7 +69,7 @@ class OnMessage {
         'maxHoldingSeconds': maxHoldingSeconds,
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 }
@@ -219,7 +219,7 @@ class Client {
       });
       return client;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -267,7 +267,7 @@ class Client {
       );
       return message;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -294,7 +294,7 @@ class Client {
       );
       return message;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -324,7 +324,7 @@ class Client {
       });
       return hash;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -347,7 +347,7 @@ class Client {
       });
       return hash;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -366,7 +366,7 @@ class Client {
       });
       return count;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -383,7 +383,7 @@ class Client {
       }
       return Map<String, dynamic>.from(resp);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -416,7 +416,7 @@ class Client {
       }
       return Map<String, dynamic>.from(resp);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -426,7 +426,7 @@ class Client {
       int? resp = await _methodChannel.invokeMethod('getHeight', {'_id': this.address});
       return resp;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -443,7 +443,7 @@ class Client {
       });
       return resp;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -457,7 +457,7 @@ class Client {
       });
       return resp;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 }

@@ -23,8 +23,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Client _client1;
-  Client _client2;
+  Client? _client1;
+  Client? _client2;
 
   @override
   void initState() {
@@ -95,7 +95,7 @@ class _MyAppState extends State<MyApp> {
                           '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
                           config: WalletConfig(password: '123'));
                       print(await wallet.getBalance());
-                      String hash = await wallet.transfer(wallet.address, '0');
+                      String? hash = await wallet.transfer(wallet.address, '0');
                       print(hash);
                     },
                     child: Text('transfer'),
@@ -105,21 +105,21 @@ class _MyAppState extends State<MyApp> {
                       Wallet wallet = await Wallet.restore(
                           '{"Version":2,"IV":"d103adf904b4b2e8cca9659e88201e5d","MasterKey":"20042c80ccb809c72eb5cf4390b29b2ef0efb014b38f7229d48fb415ccf80668","SeedEncrypted":"3bcdca17d84dc7088c4b3f929cf1e96cf66c988f2b306f076fd181e04c5be187","Address":"NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7","Scrypt":{"Salt":"a455be75074c2230","N":32768,"R":8,"P":1}}',
                           config: WalletConfig(password: '123'));
-                      int nonce = await wallet.getNonce();
+                      int? nonce = await wallet.getNonce();
                       print(nonce);
                     },
                     child: Text('getNonce'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      int height = await Wallet.getHeight();
+                      int? height = await Wallet.getHeight();
                       print(height);
                     },
                     child: Text('getHeight'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      int nonce = await Wallet.getNonceByAddress(
+                      int? nonce = await Wallet.getNonceByAddress(
                           'NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
                       print(nonce);
                     },
@@ -150,14 +150,14 @@ class _MyAppState extends State<MyApp> {
                         ),
                       );
                       print('-------------_client1----------');
-                      print(_client1.address);
-                      _client1.onConnect.listen((event) {
+                      print(_client1?.address);
+                      _client1?.onConnect.listen((event) {
                         print('------onConnect1-----');
                         print(event.node);
                       });
 
                       Map dic = Map();
-                      _client1.onMessage.listen((event) {
+                      _client1?.onMessage.listen((event) {
                         print('------onMessage1-----');
                         if (dic[event.src] == null) {
                           dic[event.src] = 1;
@@ -171,7 +171,7 @@ class _MyAppState extends State<MyApp> {
                         print(event.data);
                         // print(event.src);
                         print(event.noReply);
-                        if (!event.noReply) {
+                        if (event.noReply != true) {
                           event.reply(jsonEncode({
                             'id': DateTime.now()
                                 .millisecondsSinceEpoch
@@ -186,7 +186,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      _client1.close();
+                      _client1?.close();
                     },
                     child: Text('close'),
                   ),
@@ -197,8 +197,8 @@ class _MyAppState extends State<MyApp> {
                         'contentType': 'text',
                         'content': 'hi'
                       }));
-                      var res = await _client1.sendText(
-                          [_client2.address],
+                      var res = await _client1?.sendText(
+                          [_client2!.address],
                           jsonEncode({
                             'id': DateTime.now()
                                 .millisecondsSinceEpoch
@@ -212,7 +212,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.subscribe(
+                      var res = await _client1?.subscribe(
                           topic: genChannelId('ttest'));
                       print(res);
                     },
@@ -220,7 +220,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.unsubscribe(
+                      var res = await _client1?.unsubscribe(
                           topic: genChannelId('ttest'));
                       print(res);
                     },
@@ -228,7 +228,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.getSubscribersCount(
+                      var res = await _client1?.getSubscribersCount(
                           topic: genChannelId('ttest'));
                       print(res);
                     },
@@ -236,16 +236,16 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.getSubscription(
+                      var res = await _client1?.getSubscription(
                           topic: genChannelId('ttest'),
-                          subscriber: _client1.address);
+                          subscriber: _client1!.address);
                       print(res);
                     },
                     child: Text('getSubscription'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.getSubscribers(
+                      var res = await _client1?.getSubscribers(
                           topic: genChannelId('ttest'));
                       print(res);
                     },
@@ -253,21 +253,21 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.getHeight();
+                      var res = await _client1?.getHeight();
                       print(res);
                     },
                     child: Text('getHeight'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.getNonce();
+                      var res = await _client1?.getNonce();
                       print(res);
                     },
                     child: Text('getNonce'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1.getNonceByAddress(
+                      var res = await _client1?.getNonceByAddress(
                           'NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
                       print(res);
                     },
@@ -286,11 +286,11 @@ class _MyAppState extends State<MyApp> {
                       await _client2?.close();
                       _client2 = await Client.create(hexDecode(
                           'bd8bd3de4dd0f798fac5a0a56e536a8bacd5b7f46d0951d8665fd68d0a910996'));
-                      _client2.onConnect.listen((event) {
+                      _client2?.onConnect.listen((event) {
                         print('------onConnect2-----');
                         print(event.node);
                       });
-                      _client2.onMessage.listen((event) {
+                      _client2?.onMessage.listen((event) {
                         print('------onMessage2-----');
                         print(event.type);
                         print(event.encrypted);
@@ -303,16 +303,16 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      _client2.close();
+                      _client2?.close();
                     },
                     child: Text('close'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client2.sendText([
-                        _client1.address
+                      var res = await _client2?.sendText([
+                        _client1!.address
                       ], jsonEncode({'contentType': 'text', 'content': 'hi2'}),noReply: false);
-                      print(res.data);
+                      print(res?.data);
                     },
                     child: Text('sendText'),
                   ),
