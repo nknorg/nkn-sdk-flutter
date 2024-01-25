@@ -10,6 +10,7 @@
 #include "ref.h"
 #include "Universe.objc.h"
 
+#include "Nkngomobile.objc.h"
 
 @class EthresolverConfig;
 @class EthresolverResolver;
@@ -34,7 +35,7 @@
 /**
  * Resolver implement ETH resolver.
  */
-@interface EthresolverResolver : NSObject <goSeqRefInterface> {
+@interface EthresolverResolver : NSObject <goSeqRefInterface, NkngomobileResolver> {
 }
 @property(strong, readonly) _Nonnull id _ref;
 
@@ -44,40 +45,47 @@
  */
 - (nullable instancetype)init:(EthresolverConfig* _Nullable)config;
 /**
- * Resolve resolves the address and returns the mapping address.
+ * Resolve wraps ResolveContext with background context.
  */
 - (NSString* _Nonnull)resolve:(NSString* _Nullable)address error:(NSError* _Nullable* _Nullable)error;
+// skipped method Resolver.ResolveContext with unsupported parameter or return types
+
 @end
 
 /**
- * CONTRACT_ADDRESS Contract address
+ * DefaultDialTimeout Dial timeout
  */
-FOUNDATION_EXPORT NSString* _Nonnull const EthresolverCONTRACT_ADDRESS;
-/**
- * PREFIX Protocol prefix
- */
-FOUNDATION_EXPORT NSString* _Nonnull const EthresolverPREFIX;
-/**
- * RPC_SERVER RPC server url
- */
-FOUNDATION_EXPORT NSString* _Nonnull const EthresolverRPC_SERVER;
+FOUNDATION_EXPORT const int64_t EthresolverDefaultDialTimeout;
 
 @interface Ethresolver : NSObject
-// skipped variable DefaultConfig with unsupported type: github.com/nknorg/eth-resolver-go.Config
+// skipped variable DefaultEthereumConfig with unsupported type: github.com/nknorg/eth-resolver-go.Config
+
+// skipped variable DefaultHarmonyConfig with unsupported type: github.com/nknorg/eth-resolver-go.Config
+
+// skipped variable DefaultIotexConfig with unsupported type: github.com/nknorg/eth-resolver-go.Config
+
+// skipped variable DefaultThetaConfig with unsupported type: github.com/nknorg/eth-resolver-go.Config
 
 @end
 
-/**
- * GetDefaultConfig returns the default Resolver config with nil pointer
-fields set to default.
- */
-FOUNDATION_EXPORT EthresolverConfig* _Nullable EthresolverGetDefaultConfig(void);
+FOUNDATION_EXPORT EthresolverConfig* _Nullable EthresolverGetDefaultEthereumConfig(void);
+
+FOUNDATION_EXPORT EthresolverConfig* _Nullable EthresolverGetDefaultHarmonyConfig(void);
+
+FOUNDATION_EXPORT EthresolverConfig* _Nullable EthresolverGetDefaultIotexConfig(void);
+
+FOUNDATION_EXPORT EthresolverConfig* _Nullable EthresolverGetDefaultThetaConfig(void);
 
 /**
  * MergeConfig merges a given Resolver config with the default Resolver config
 recursively. Any non zero value fields will override the default config.
  */
 FOUNDATION_EXPORT EthresolverConfig* _Nullable EthresolverMergeConfig(EthresolverConfig* _Nullable config, NSError* _Nullable* _Nullable error);
+
+/**
+ * NewDefaultResolvers creates default Resolvers.
+ */
+FOUNDATION_EXPORT NkngomobileResolverArray* _Nullable EthresolverNewDefaultResolvers(NSError* _Nullable* _Nullable error);
 
 /**
  * NewResolver creates a Resolver. If config is nil, the default Resolver config will be used.

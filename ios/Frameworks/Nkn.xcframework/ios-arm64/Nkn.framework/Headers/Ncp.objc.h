@@ -25,8 +25,6 @@
 @property (nonatomic) BOOL nonStream;
 @property (nonatomic) int32_t sessionWindowSize;
 @property (nonatomic) int32_t mtu;
-@property (nonatomic) int32_t initialConnectionWindowSize;
-@property (nonatomic) int32_t maxConnectionWindowSize;
 @property (nonatomic) int32_t minConnectionWindowSize;
 @property (nonatomic) int32_t maxAckSeqListSize;
 @property (nonatomic) int32_t flushInterval;
@@ -44,7 +42,7 @@
 @property(strong, readonly) _Nonnull id _ref;
 
 - (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nullable instancetype)init:(NcpSession* _Nullable)session localClientID:(NSString* _Nullable)localClientID remoteClientID:(NSString* _Nullable)remoteClientID;
+- (nullable instancetype)init:(NcpSession* _Nullable)session localClientID:(NSString* _Nullable)localClientID remoteClientID:(NSString* _Nullable)remoteClientID initialWindowSize:(double)initialWindowSize;
 // skipped field Connection.RWMutex with unsupported type: sync.RWMutex
 
 - (void)lock;
@@ -142,6 +140,9 @@ FOUNDATION_EXPORT const int64_t NcpMinSequenceID;
 + (NcpGenericError* _Nullable) errConnClosed;
 + (void) setErrConnClosed:(NcpGenericError* _Nullable)v;
 
++ (NcpGenericError* _Nullable) errConnNotFound;
++ (void) setErrConnNotFound:(NcpGenericError* _Nullable)v;
+
 + (NcpGenericError* _Nullable) errDataSizeTooLarge;
 + (void) setErrDataSizeTooLarge:(NcpGenericError* _Nullable)v;
 
@@ -176,7 +177,7 @@ FOUNDATION_EXPORT const int64_t NcpMinSequenceID;
 
 FOUNDATION_EXPORT NcpConfig* _Nullable NcpMergeConfig(NcpConfig* _Nullable conf, NSError* _Nullable* _Nullable error);
 
-FOUNDATION_EXPORT NcpConnection* _Nullable NcpNewConnection(NcpSession* _Nullable session, NSString* _Nullable localClientID, NSString* _Nullable remoteClientID, NSError* _Nullable* _Nullable error);
+FOUNDATION_EXPORT NcpConnection* _Nullable NcpNewConnection(NcpSession* _Nullable session, NSString* _Nullable localClientID, NSString* _Nullable remoteClientID, double initialWindowSize, NSError* _Nullable* _Nullable error);
 
 FOUNDATION_EXPORT NcpGenericError* _Nullable NcpNewGenericError(NSString* _Nullable err, BOOL timeout, BOOL temporary);
 

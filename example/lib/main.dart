@@ -59,8 +59,7 @@ class _MyAppState extends State<MyApp> {
                 children: [
                   TextButton(
                     onPressed: () async {
-                      Wallet wallet = await Wallet.create(null,
-                          config: WalletConfig(password: '123'));
+                      Wallet wallet = await Wallet.create(null, config: WalletConfig(password: '123'));
                       print(wallet.address);
                       print(wallet.seed);
                       print(wallet.publicKey);
@@ -119,8 +118,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      int? nonce = await Wallet.getNonceByAddress(
-                          'NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
+                      int? nonce = await Wallet.getNonceByAddress('NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
                       print(nonce);
                     },
                     child: Text('getNonceByAddress'),
@@ -172,13 +170,7 @@ class _MyAppState extends State<MyApp> {
                         // print(event.src);
                         print(event.noReply);
                         if (event.noReply != true) {
-                          event.reply(jsonEncode({
-                            'id': DateTime.now()
-                                .millisecondsSinceEpoch
-                                .toString(),
-                            'contentType': 'text',
-                            'content': 'reply'
-                          }));
+                          event.reply(jsonEncode({'id': DateTime.now().millisecondsSinceEpoch.toString(), 'contentType': 'text', 'content': 'reply'}));
                         }
                       });
                     },
@@ -191,62 +183,50 @@ class _MyAppState extends State<MyApp> {
                     child: Text('close'),
                   ),
                   TextButton(
+                      onPressed: () async {
+                        await _client1?.reconnect();
+                      },
+                      child: Text('reconnect')),
+                  TextButton(
                     onPressed: () async {
-                      print(jsonEncode({
-                        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-                        'contentType': 'text',
-                        'content': 'hi'
-                      }));
-                      var res = await _client1?.sendText(
-                          [_client2!.address],
-                          jsonEncode({
-                            'id': DateTime.now()
-                                .millisecondsSinceEpoch
-                                .toString(),
-                            'contentType': 'text',
-                            'content': 'hi'
-                          }));
+                      print(jsonEncode({'id': DateTime.now().millisecondsSinceEpoch.toString(), 'contentType': 'text', 'content': 'hi'}));
+                      var res = await _client1
+                          ?.sendText([_client2!.address], jsonEncode({'id': DateTime.now().millisecondsSinceEpoch.toString(), 'contentType': 'text', 'content': 'hi'}));
                       print(res);
                     },
                     child: Text('sendText'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1?.subscribe(
-                          topic: genChannelId('ttest'));
+                      var res = await _client1?.subscribe(topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('subscribe'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1?.unsubscribe(
-                          topic: genChannelId('ttest'));
+                      var res = await _client1?.unsubscribe(topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('unsubscribe'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1?.getSubscribersCount(
-                          topic: genChannelId('ttest'));
+                      var res = await _client1?.getSubscribersCount(topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('getSubscribersCount'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1?.getSubscription(
-                          topic: genChannelId('ttest'),
-                          subscriber: _client1!.address);
+                      var res = await _client1?.getSubscription(topic: genChannelId('ttest'), subscriber: _client1!.address);
                       print(res);
                     },
                     child: Text('getSubscription'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1?.getSubscribers(
-                          topic: genChannelId('ttest'));
+                      var res = await _client1?.getSubscribers(topic: genChannelId('ttest'));
                       print(res);
                     },
                     child: Text('getSubscribers'),
@@ -267,8 +247,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client1?.getNonceByAddress(
-                          'NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
+                      var res = await _client1?.getNonceByAddress('NKNVgahGfYYxYaJdGZHZSxBg2QJpUhRH24M7');
                       print(res);
                     },
                     child: Text('getNonceByAddress'),
@@ -284,8 +263,7 @@ class _MyAppState extends State<MyApp> {
                   TextButton(
                     onPressed: () async {
                       await _client2?.close();
-                      _client2 = await Client.create(hexDecode(
-                          'bd8bd3de4dd0f798fac5a0a56e536a8bacd5b7f46d0951d8665fd68d0a910996'));
+                      _client2 = await Client.create(hexDecode('bd8bd3de4dd0f798fac5a0a56e536a8bacd5b7f46d0951d8665fd68d0a910996'));
                       _client2?.onConnect.listen((event) {
                         print('------onConnect2-----');
                         print(event.node);
@@ -309,9 +287,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   TextButton(
                     onPressed: () async {
-                      var res = await _client2?.sendText([
-                        _client1!.address
-                      ], jsonEncode({'contentType': 'text', 'content': 'hi2'}),noReply: false);
+                      var res = await _client2?.sendText([_client1!.address], jsonEncode({'contentType': 'text', 'content': 'hi2'}), noReply: false);
                       print(res?.data);
                     },
                     child: Text('sendText'),
@@ -326,30 +302,19 @@ class _MyAppState extends State<MyApp> {
                 children: [
                   TextButton(
                     onPressed: () async {
-                      Wallet wallet = await Wallet.create(
-                          hexDecode(
-                              'a2df9fafa747b4da6afa58cdee8e170f0a71815584c3ed3bfa52040c89d0bd61'),
-                          config: WalletConfig(password: '123'));
-                      Uint8List privateKey =
-                          await Crypto.getPrivateKeyFromSeed(wallet.seed);
-                      var res = await Crypto.sign(privateKey,
-                          Uint8List.fromList(utf8.encode('Hello, world!')));
+                      Wallet wallet = await Wallet.create(hexDecode('a2df9fafa747b4da6afa58cdee8e170f0a71815584c3ed3bfa52040c89d0bd61'), config: WalletConfig(password: '123'));
+                      Uint8List privateKey = await Crypto.getPrivateKeyFromSeed(wallet.seed);
+                      var res = await Crypto.sign(privateKey, Uint8List.fromList(utf8.encode('Hello, world!')));
                       print(hexEncode(res));
                     },
                     child: Text('sign'),
                   ),
                   TextButton(
                     onPressed: () async {
-                      Wallet wallet = await Wallet.create(
-                          hexDecode(
-                              'a2df9fafa747b4da6afa58cdee8e170f0a71815584c3ed3bfa52040c89d0bd61'),
-                          config: WalletConfig(password: '123'));
+                      Wallet wallet = await Wallet.create(hexDecode('a2df9fafa747b4da6afa58cdee8e170f0a71815584c3ed3bfa52040c89d0bd61'), config: WalletConfig(password: '123'));
 
-                      bool verified = await Crypto.verify(
-                          wallet.publicKey,
-                          Uint8List.fromList(utf8.encode('Hello, world!')),
-                          hexDecode(
-                              'fc81c36aa9002bb973fb7db3b8d334ae52194edf5e051d4c5105d20fbbad7287cd5172aea0acac43d843bf3b692aa486d96e4dcfbed9b7dcfb6e7c385c070d0d'));
+                      bool verified = await Crypto.verify(wallet.publicKey, Uint8List.fromList(utf8.encode('Hello, world!')),
+                          hexDecode('fc81c36aa9002bb973fb7db3b8d334ae52194edf5e051d4c5105d20fbbad7287cd5172aea0acac43d843bf3b692aa486d96e4dcfbed9b7dcfb6e7c385c070d0d'));
                       print(verified);
                     },
                     child: Text('verify'),

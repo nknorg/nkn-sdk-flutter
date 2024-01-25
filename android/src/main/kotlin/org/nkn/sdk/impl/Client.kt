@@ -75,40 +75,42 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         } catch (e: Throwable) {
             eventSink?.error(id, e.localizedMessage, "")
             return@withContext
+        } finally {
+            clientMap.remove(id)
         }
-        clientMap.remove(id)
     }
 
-    private suspend fun onConnect(client: MultiClient, numSubClients: Long) =
-        withContext(Dispatchers.IO) {
-            try {
-                val node = client.onConnect.next()
-                val rpcServers = ArrayList<String>()
-                for (i in 0..numSubClients) {
-                    val c = client.getClient(i)
-                    val rpcNode = c?.node
-                    var rpcAddr = rpcNode?.rpcAddr ?: ""
-                    if (rpcAddr.isNotEmpty()) {
-                        rpcAddr = "http://$rpcAddr"
-                        if (!rpcServers.contains(rpcAddr)) {
-                            rpcServers.add(rpcAddr)
-                        }
+    private suspend fun onConnect(client: MultiClient, numSubClients: Long) {
+        try {
+            val node = client.onConnect.next()
+            val rpcServers = ArrayList<String>()
+            for (i in 0..numSubClients) {
+                val c = client.getClient(i)
+                val rpcNode = c?.node
+                var rpcAddr = rpcNode?.rpcAddr ?: ""
+                if (rpcAddr.isNotEmpty()) {
+                    rpcAddr = "http://$rpcAddr"
+                    if (!rpcServers.contains(rpcAddr)) {
+                        rpcServers.add(rpcAddr)
                     }
                 }
-
-                val resp = hashMapOf(
-                    "_id" to client.address(),
-                    "event" to "onConnect",
-                    "node" to hashMapOf("address" to node.addr, "publicKey" to node.pubKey),
-                    "client" to hashMapOf("address" to client.address()),
-                    "rpcServers" to rpcServers
-                )
-                Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
-                eventSinkSuccess(eventSink, resp)
-            } catch (e: Throwable) {
-                eventSinkError(eventSink, client.address(), e.localizedMessage)
             }
+
+            val resp = hashMapOf(
+                "_id" to client.address(),
+                "event" to "onConnect",
+                "node" to hashMapOf("address" to node.addr, "publicKey" to node.pubKey),
+                "client" to hashMapOf("address" to client.address()),
+                "rpcServers" to rpcServers
+            )
+            Log.d(NknSdkFlutterPlugin.TAG, resp.toString())
+            eventSinkSuccess(eventSink, resp)
+        } catch (e: Throwable) {
+            eventSinkError(eventSink, client.address(), e.localizedMessage)
         }
+
+        onConnect(client, numSubClients)
+    }
 
     private suspend fun onMessage(client: MultiClient) {
         try {
@@ -142,42 +144,55 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             "create" -> {
                 create(call, result)
             }
+
             "reconnect" -> {
                 reconnect(call, result)
             }
+
             "close" -> {
                 close(call, result)
             }
+
             "replyText" -> {
                 replyText(call, result)
             }
+
             "sendText" -> {
                 sendText(call, result)
             }
+
             "publishText" -> {
                 publishText(call, result)
             }
+
             "subscribe" -> {
                 subscribe(call, result)
             }
+
             "unsubscribe" -> {
                 unsubscribe(call, result)
             }
+
             "getSubscribersCount" -> {
                 getSubscribersCount(call, result)
             }
+
             "getSubscribers" -> {
                 getSubscribers(call, result)
             }
+
             "getSubscription" -> {
                 getSubscription(call, result)
             }
+
             "getHeight" -> {
                 getHeight(call, result)
             }
+
             "getNonce" -> {
                 getNonce(call, result)
             }
+
             else -> {
                 result.notImplemented()
             }
@@ -249,9 +264,10 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 )
                 resultSuccess(result, data)
 
-                onConnect(client, numSubClients)
-
-                async(Dispatchers.IO) { onMessage(client) }
+                async(Dispatchers.IO) {
+                    onConnect(client, numSubClients)
+//                    onMessage(client)
+                }
             } catch (e: Throwable) {
                 resultError(result, "", e.localizedMessage)
             }

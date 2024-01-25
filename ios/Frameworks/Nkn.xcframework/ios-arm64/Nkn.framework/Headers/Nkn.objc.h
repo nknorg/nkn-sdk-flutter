@@ -48,6 +48,8 @@
 @class NknOnMessageFunc;
 @protocol NknRPCConfigInterface;
 @class NknRPCConfigInterface;
+@protocol NknResolver;
+@class NknResolver;
 
 @protocol NknErrorWithCode <NSObject>
 - (int32_t)code;
@@ -70,6 +72,12 @@
 - (int32_t)rpcGetConcurrency;
 - (int32_t)rpcGetRPCTimeout;
 - (NkngomobileStringArray* _Nullable)rpcGetSeedRPCServerAddr;
+@end
+
+@protocol NknResolver <NSObject>
+- (NSString* _Nonnull)resolve:(NSString* _Nullable)address error:(NSError* _Nullable* _Nullable)error;
+// skipped method Resolver.ResolveContext with unsupported parameter or return types
+
 @end
 
 /**
@@ -132,7 +140,7 @@ will be parsed as 0.1 NKN.
 /**
  * Client sends and receives data between any NKN clients regardless their
 network condition without setting up a server or relying on any third party
-services. Data are end to end encrypted by default. Typically you might want
+services. Data are end-to-end encrypted by default. Typically, you might want
 to use multiclient instead of using client directly.
  */
 @interface NknClient : NSObject <goSeqRefInterface> {
@@ -275,12 +283,24 @@ compatibility.
 /**
  * Reconnect forces the client to find node and connect again.
  */
-- (void)reconnect;
+- (void)reconnect:(NknNode* _Nullable)node;
 /**
  * RegisterName wraps RegisterNameContext with background context.
  */
 - (NSString* _Nonnull)registerName:(NSString* _Nullable)name config:(NknTransactionConfig* _Nullable)config error:(NSError* _Nullable* _Nullable)error;
 // skipped method Client.RegisterNameContext with unsupported parameter or return types
+
+/**
+ * ResolveDest wraps ResolveDestContext with background context
+ */
+- (NSString* _Nonnull)resolveDest:(NSString* _Nullable)dest error:(NSError* _Nullable* _Nullable)error;
+// skipped method Client.ResolveDestContext with unsupported parameter or return types
+
+/**
+ * ResolveDests wraps ResolveDestsContext with background context
+ */
+- (NkngomobileStringArray* _Nullable)resolveDests:(NkngomobileStringArray* _Nullable)dests error:(NSError* _Nullable* _Nullable)error;
+// skipped method Client.ResolveDestsContext with unsupported parameter or return types
 
 /**
  * Seed returns the secret seed of the client. Secret seed can be used to create
@@ -390,6 +410,7 @@ compatibility.
 
 @property (nonatomic) NkngomobileResolverArray* _Nullable resolvers;
 @property (nonatomic) int32_t resolverDepth;
+@property (nonatomic) int32_t resolverTimeout;
 /**
  * RPCGetConcurrency returns RPC concurrency. RPC prefix is added to avoid
 gomobile compile error.
@@ -486,7 +507,7 @@ reliable streaming protocol similar to TCP based on ncp
 /**
  * NewMultiClient creates a multiclient with an account, an optional identifier,
 number of sub clients to create, whether to create original client without
-identifier prefix, and a optional client config that will be applied to all
+identifier prefix, and an optional client config that will be applied to all
 clients created. For any zero value field in config, the default client
 config value will be used. If config is nil, the default client config will
 be used.
@@ -570,7 +591,7 @@ If config is nil, the default dial config of this multiclient will be used.
 
 /**
  * GetDefaultClient returns the default client, which is the client with
-smallest index.
+the smallest index.
  */
 - (NknClient* _Nullable)getDefaultClient;
 /**
@@ -663,6 +684,18 @@ compatibility.
  */
 - (NSString* _Nonnull)registerName:(NSString* _Nullable)name config:(NknTransactionConfig* _Nullable)config error:(NSError* _Nullable* _Nullable)error;
 // skipped method MultiClient.RegisterNameContext with unsupported parameter or return types
+
+/**
+ * ResolveDest wraps ResolveDestContext with background context
+ */
+- (NSString* _Nonnull)resolveDest:(NSString* _Nullable)dest error:(NSError* _Nullable* _Nullable)error;
+// skipped method MultiClient.ResolveDestContext with unsupported parameter or return types
+
+/**
+ * ResolveDests wraps ResolveDestsContext with background context
+ */
+- (NkngomobileStringArray* _Nullable)resolveDests:(NkngomobileStringArray* _Nullable)dests error:(NSError* _Nullable* _Nullable)error;
+// skipped method MultiClient.ResolveDestsContext with unsupported parameter or return types
 
 /**
  * Seed returns the secret seed of the multiclient. Secret seed can be used to
@@ -859,6 +892,11 @@ function.
 
 @property (nonatomic) id<NknOnConnectFunc> _Nullable callback;
 /**
+ * MaybeNext returns the next element in the channel, or nil if channel is
+empty.
+ */
+- (NknNode* _Nullable)maybeNext;
+/**
  * Next waits and returns the next element from the channel.
  */
 - (NknNode* _Nullable)next;
@@ -881,6 +919,11 @@ function.
 
 @property (nonatomic) id<NknOnErrorFunc> _Nullable callback;
 /**
+ * MaybeNext returns the next element in the channel, or nil if channel is
+empty.
+ */
+- (BOOL)maybeNext:(NSError* _Nullable* _Nullable)error;
+/**
  * Next waits and returns the next element from the channel.
  */
 - (BOOL)next:(NSError* _Nullable* _Nullable)error;
@@ -902,6 +945,11 @@ function.
 // skipped field OnMessage.C with unsupported type: chan *github.com/nknorg/nkn-sdk-go.Message
 
 @property (nonatomic) id<NknOnMessageFunc> _Nullable callback;
+/**
+ * MaybeNext returns the next element in the channel, or nil if channel is
+empty.
+ */
+- (NknMessage* _Nullable)maybeNext;
 /**
  * Next waits and returns the next element from the channel.
  */
@@ -1361,6 +1409,12 @@ FOUNDATION_EXPORT const int32_t NknTextType;
 /**
  * Error definitions.
  */
++ (NSError* _Nullable) errInvalidResolver;
++ (void) setErrInvalidResolver:(NSError* _Nullable)v;
+
+/**
+ * Error definitions.
+ */
 + (NSError* _Nullable) errInvalidWalletVersion;
 + (void) setErrInvalidWalletVersion:(NSError* _Nullable)v;
 
@@ -1580,7 +1634,7 @@ FOUNDATION_EXPORT NknNode* _Nullable NknGetWssAddr(NSString* _Nullable clientAdd
 
 /**
  * MergeClientConfig merges a given client config with the default client config
-recursively. Any non zero value fields will override the default config.
+recursively. Any non-zero value fields will override the default config.
  */
 FOUNDATION_EXPORT NknClientConfig* _Nullable NknMergeClientConfig(NknClientConfig* _Nullable conf, NSError* _Nullable* _Nullable error);
 
@@ -1606,7 +1660,7 @@ FOUNDATION_EXPORT NknTransactionConfig* _Nullable NknMergeTransactionConfig(NknT
 
 /**
  * MergeWalletConfig merges a given wallet config with the default wallet config
-recursively. Any non zero value fields will override the default config.
+recursively. Any non-zero value fields will override the default config.
  */
 FOUNDATION_EXPORT NknWalletConfig* _Nullable NknMergeWalletConfig(NknWalletConfig* _Nullable conf, NSError* _Nullable* _Nullable error);
 
@@ -1638,7 +1692,7 @@ FOUNDATION_EXPORT NknClientAddr* _Nullable NknNewClientAddr(NSString* _Nullable 
 /**
  * NewMultiClient creates a multiclient with an account, an optional identifier,
 number of sub clients to create, whether to create original client without
-identifier prefix, and a optional client config that will be applied to all
+identifier prefix, and an optional client config that will be applied to all
 clients created. For any zero value field in config, the default client
 config value will be used. If config is nil, the default client config will
 be used.
@@ -1727,6 +1781,8 @@ FOUNDATION_EXPORT NknWallet* _Nullable NknWalletFromJSON(NSString* _Nullable wal
 
 @class NknRPCConfigInterface;
 
+@class NknResolver;
+
 /**
  * ErrorWithCode is an error interface that implements error and Code()
  */
@@ -1786,6 +1842,16 @@ error.
 - (int32_t)rpcGetConcurrency;
 - (int32_t)rpcGetRPCTimeout;
 - (NkngomobileStringArray* _Nullable)rpcGetSeedRPCServerAddr;
+@end
+
+@interface NknResolver : NSObject <goSeqRefInterface, NknResolver> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (NSString* _Nonnull)resolve:(NSString* _Nullable)address error:(NSError* _Nullable* _Nullable)error;
+// skipped method Resolver.ResolveContext with unsupported parameter or return types
+
 @end
 
 #endif

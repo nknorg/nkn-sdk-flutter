@@ -57,8 +57,29 @@
 
 FOUNDATION_EXPORT const int64_t TransactionTransactionNonceLength;
 
+@interface Transaction : NSObject
+// skipped variable DefaultCompare with unsupported type: func(txn1 *github.com/nknorg/nkn/v2/transaction.Transaction, txn2 *github.com/nknorg/nkn/v2/transaction.Transaction) int
+
+@end
+
+FOUNDATION_EXPORT long TransactionCompareTxnsByFee(TransactionTransaction* _Nullable txn1, TransactionTransaction* _Nullable txn2);
+
+FOUNDATION_EXPORT long TransactionCompareTxnsByFeePerSize(TransactionTransaction* _Nullable txn1, TransactionTransaction* _Nullable txn2);
+
+// skipped function DefaultHeap with unsupported parameter or return types
+
+
+FOUNDATION_EXPORT BOOL TransactionDefaultIsLowFeeTxn(TransactionTransaction* _Nullable txn);
+
+// skipped function DefaultSort with unsupported parameter or return types
+
+
 // skipped function HashToShortHash with unsupported parameter or return types
 
+
+FOUNDATION_EXPORT BOOL TransactionIsLowFeePerSizeTxn(TransactionTransaction* _Nullable txn);
+
+FOUNDATION_EXPORT BOOL TransactionIsLowFeeTxn(TransactionTransaction* _Nullable txn);
 
 // skipped function NewCoinbase with unsupported parameter or return types
 
