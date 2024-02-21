@@ -266,7 +266,9 @@ class Client : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
                 async(Dispatchers.IO) {
                     onConnect(client, numSubClients)
-//                    onMessage(client)
+                }
+                async(Dispatchers.IO) {
+                    onMessage(client)
                 }
             } catch (e: Throwable) {
                 resultError(result, "", e.localizedMessage)

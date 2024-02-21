@@ -1,3 +1,7 @@
+## 0.6.0
+
+* Fix android receive message
+
 ## 0.5.0
 
 * Upgrade dependencies
