@@ -44,6 +44,10 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
             restore(call, result: result)
         case "pubKeyToWalletAddr":
             pubKeyToWalletAddr(call, result: result)
+        case "programHashToAddr":
+            programHashToAddr(call, result: result)
+        case "pubKeyToProgramHash":
+            pubKeyToProgramHash(call, result: result)
         case "getBalance" :
             getBalance(call, result: result)
         case "transfer":
@@ -120,12 +124,21 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 return
             }
             let wallet = NknWallet(account, config: config)
-
+            let pubKey = wallet?.pubKey()
             var resp:[String:Any] = [String:Any]()
             resp["address"] = wallet?.address()
             resp["keystore"] = wallet?.toJSON(nil)
-            resp["publicKey"] = wallet?.pubKey()
+            resp["publicKey"] = pubKey
             resp["seed"] = wallet?.seed()
+            
+            var pubKeyToProgramHashError: NSError?
+            let programHash = NkngolibPubKeyToProgramHash(pubKey, &pubKeyToProgramHashError)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+            resp["programHash"] = programHash
+            
             self.resultSuccess(result: result, resp: resp)
         }
         walletQueue.async(execute: walletWorkItem!)
@@ -159,12 +172,22 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 self.resultError(result: result, error: error)
                 return
             }
+            let pubKey = wallet?.pubKey()
 
             var resp:[String:Any] = [String:Any]()
             resp["address"] = wallet?.address()
             resp["keystore"] = wallet?.toJSON(nil)
-            resp["publicKey"] = wallet?.pubKey()
+            resp["publicKey"] = pubKey
             resp["seed"] = wallet?.seed()
+            
+            var pubKeyToProgramHashError: NSError?
+            let programHash = NkngolibPubKeyToProgramHash(pubKey, &pubKeyToProgramHashError)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+            resp["programHash"] = programHash
+            
             self.resultSuccess(result: result, resp: resp)
         }
         walletQueue.async(execute: walletWorkItem!)
@@ -172,16 +195,48 @@ class Wallet : ChannelBase, IChannelHandler, FlutterStreamHandler {
 
     private func pubKeyToWalletAddr(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments as! [String: Any]
-        let publicKey = args["publicKey"] as! String
+        let publicKey = args["pubKey"] as! FlutterStandardTypedData
 
         walletWorkItem = DispatchWorkItem {
             var error: NSError?
-            let address = NknPubKeyToWalletAddr(Data(hex: publicKey), &error)
+            let address = NknPubKeyToWalletAddr(publicKey.data, &error)
             if (error != nil) {
                 self.resultError(result: result, error: error)
                 return
             }
             self.resultSuccess(result: result, resp: address)
+        }
+        walletQueue.async(execute: walletWorkItem!)
+    }
+    
+    private func programHashToAddr(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let programHash = args["programHash"] as! FlutterStandardTypedData
+
+        walletWorkItem = DispatchWorkItem {
+            var error: NSError?
+            let address = NkngolibProgramHashToAddr(programHash.data, &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+            self.resultSuccess(result: result, resp: address)
+        }
+        walletQueue.async(execute: walletWorkItem!)
+    }
+    
+    private func pubKeyToProgramHash(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let args = call.arguments as! [String: Any]
+        let pubKey = args["pubKey"] as! FlutterStandardTypedData
+
+        walletWorkItem = DispatchWorkItem {
+            var error: NSError?
+            let programHash = NkngolibPubKeyToProgramHash(pubKey.data, &error)
+            if (error != nil) {
+                self.resultError(result: result, error: error)
+                return
+            }
+            self.resultSuccess(result: result, resp: programHash)
         }
         walletQueue.async(execute: walletWorkItem!)
     }

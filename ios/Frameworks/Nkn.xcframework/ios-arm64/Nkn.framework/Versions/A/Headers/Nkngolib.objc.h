@@ -19,6 +19,10 @@ FOUNDATION_EXPORT void NkngolibAddClientConfigWithDialContext(NknClientConfig* _
 
 FOUNDATION_EXPORT NkngomobileStringArray* _Nullable NkngolibMeasureSeedRPCServer(NkngomobileStringArray* _Nullable seedRPCList, int32_t timeout, NSError* _Nullable* _Nullable error);
 
+FOUNDATION_EXPORT NSString* _Nonnull NkngolibProgramHashToAddr(NSData* _Nullable hash, NSError* _Nullable* _Nullable error);
+
+FOUNDATION_EXPORT NSData* _Nullable NkngolibPubKeyToProgramHash(NSData* _Nullable pubKey, NSError* _Nullable* _Nullable error);
+
 FOUNDATION_EXPORT BOOL NkngolibReply(NknMultiClient* _Nullable c, NknMessage* _Nullable msg, NSString* _Nullable data, BOOL encrypted, int32_t maxHoldingSeconds, NSError* _Nullable* _Nullable error);
 
 #endif

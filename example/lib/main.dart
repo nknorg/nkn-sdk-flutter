@@ -64,6 +64,7 @@ class _MyAppState extends State<MyApp> {
                       print(wallet.seed);
                       print(wallet.publicKey);
                       print(wallet.keystore);
+                      print(wallet.programHash);
                     },
                     child: Text('create'),
                   ),
@@ -76,6 +77,7 @@ class _MyAppState extends State<MyApp> {
                       print(wallet.seed);
                       print(wallet.publicKey);
                       print(wallet.keystore);
+                      print(wallet.programHash);
                     },
                     child: Text('restore'),
                   ),

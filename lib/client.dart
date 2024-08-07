@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:nkn_sdk_flutter/utils/hex.dart';
 import 'package:nkn_sdk_flutter/wallet.dart';
 
 /// NKN message's PayloadType
@@ -435,7 +434,7 @@ class Client {
   /// transactions in txPool are also counted.
   Future<int?> getNonce({bool txPool = true}) async {
     try {
-      String? walletAddr = await Wallet.pubKeyToWalletAddr(hexEncode(this.publicKey));
+      String? walletAddr = await Wallet.pubKeyToWalletAddr(this.publicKey);
       int? resp = await _methodChannel.invokeMethod('getNonce', {
         '_id': this.address,
         'address': walletAddr,

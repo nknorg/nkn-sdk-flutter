@@ -43,9 +43,11 @@
  */
 - (nullable instancetype)init:(DnsresolverConfig* _Nullable)config;
 /**
- * Resolve resolves the address and returns the mapping address.
+ * Resolve wraps ResolveContext with background context.
  */
 - (NSString* _Nonnull)resolve:(NSString* _Nullable)address error:(NSError* _Nullable* _Nullable)error;
+// skipped method Resolver.ResolveContext with unsupported parameter or return types
+
 @end
 
 /**
@@ -65,11 +67,11 @@ FOUNDATION_EXPORT NSString* _Nonnull const DnsresolverTXT_PREFIX;
 // skipped variable DefaultConfig with unsupported type: github.com/nknorg/dns-resolver-go.Config
 
 /**
- * ErrInvalidDomain is returned when a string representing a domain name
-is not actually a valid domain.
+ * ErrInvalidAddress is returned when a string representing an address
+is not actually a valid address.
  */
-+ (NSError* _Nullable) errInvalidDomain;
-+ (void) setErrInvalidDomain:(NSError* _Nullable)v;
++ (NSError* _Nullable) errInvalidAddress;
++ (void) setErrInvalidAddress:(NSError* _Nullable)v;
 
 /**
  * ErrInvalidRecord is returned when the nkn entry in a TXT record
@@ -93,6 +95,8 @@ fields set to default.
  */
 FOUNDATION_EXPORT DnsresolverConfig* _Nullable DnsresolverGetDefaultConfig(void);
 
+FOUNDATION_EXPORT BOOL DnsresolverIsEmail(NSString* _Nullable email);
+
 /**
  * MergeConfig merges a given Resolver config with the default Resolver config
 recursively. Any non zero value fields will override the default config.
@@ -107,6 +111,6 @@ FOUNDATION_EXPORT DnsresolverResolver* _Nullable DnsresolverNewResolver(Dnsresol
 /**
  * ParseTXT parses a TXT record value.
  */
-FOUNDATION_EXPORT NSString* _Nonnull DnsresolverParseTXT(NSString* _Nullable txt, NSError* _Nullable* _Nullable error);
+FOUNDATION_EXPORT NSString* _Nonnull DnsresolverParseTXT(NSString* _Nullable txt, NSString* _Nullable key, NSError* _Nullable* _Nullable error);
 
 #endif

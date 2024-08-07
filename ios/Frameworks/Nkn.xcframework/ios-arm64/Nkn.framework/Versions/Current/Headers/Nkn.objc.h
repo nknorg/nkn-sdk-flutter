@@ -411,6 +411,11 @@ compatibility.
 @property (nonatomic) NkngomobileResolverArray* _Nullable resolvers;
 @property (nonatomic) int32_t resolverDepth;
 @property (nonatomic) int32_t resolverTimeout;
+@property (nonatomic) BOOL webRTC;
+@property (nonatomic) NkngomobileStringArray* _Nullable stunServerAddr;
+@property (nonatomic) int32_t webRTCConnectTimeout;
+@property (nonatomic) long multiClientNumClients;
+@property (nonatomic) BOOL multiClientOriginalClient;
 /**
  * RPCGetConcurrency returns RPC concurrency. RPC prefix is added to avoid
 gomobile compile error.
@@ -511,8 +516,17 @@ identifier prefix, and an optional client config that will be applied to all
 clients created. For any zero value field in config, the default client
 config value will be used. If config is nil, the default client config will
 be used.
+
+Deprecated:  Use NewMultiClientV2 instead.
  */
 - (nullable instancetype)init:(NknAccount* _Nullable)account baseIdentifier:(NSString* _Nullable)baseIdentifier numSubClients:(long)numSubClients originalClient:(BOOL)originalClient config:(NknClientConfig* _Nullable)config;
+/**
+ * NewMultiClientV2 creates a MultiClient with an account, an optional identifier,
+and a optional client config. For any zero value field in config, the default
+client config value will be used. If config is nil, the default client config
+will be used.
+ */
+- (nullable instancetype)initV2:(NknAccount* _Nullable)account identifier:(NSString* _Nullable)identifier config:(NknClientConfig* _Nullable)config;
 @property (nonatomic) NknOnConnect* _Nullable onConnect;
 @property (nonatomic) NknOnMessage* _Nullable onMessage;
 // skipped method MultiClient.Accept with unsupported parameter or return types
@@ -845,6 +859,7 @@ before accepting new one.
 @property (nonatomic) NSString* _Nonnull rpcAddr;
 @property (nonatomic) NSString* _Nonnull pubKey;
 @property (nonatomic) NSString* _Nonnull id_;
+@property (nonatomic) NSString* _Nonnull sdp;
 @end
 
 /**
@@ -1318,6 +1333,8 @@ FOUNDATION_EXPORT const int32_t NknTextType;
 
 // skipped variable DefaultSessionConfig with unsupported type: github.com/nknorg/ncp-go.Config
 
+// skipped variable DefaultStunServerAddr with unsupported type: []string
+
 // skipped variable DefaultTransactionConfig with unsupported type: github.com/nknorg/nkn-sdk-go.TransactionConfig
 
 // skipped variable DefaultWalletConfig with unsupported type: github.com/nknorg/nkn-sdk-go.WalletConfig
@@ -1579,6 +1596,14 @@ FOUNDATION_EXPORT BOOL NknGetNonce(NSString* _Nullable address, BOOL txPool, id<
 
 
 /**
+ * GetWsAddr wraps GetWsAddrContext with background context.
+ */
+FOUNDATION_EXPORT NknNode* _Nullable NknGetPeerAddr(NSString* _Nullable clientAddr, NSString* _Nullable offer, id<NknRPCConfigInterface> _Nullable config, NSError* _Nullable* _Nullable error);
+
+// skipped function GetPeerAddrContext with unsupported parameter or return types
+
+
+/**
  * GetRegistrant wraps GetRegistrantContext with background context.
  */
 FOUNDATION_EXPORT NknRegistrant* _Nullable NknGetRegistrant(NSString* _Nullable name, id<NknRPCConfigInterface> _Nullable config, NSError* _Nullable* _Nullable error);
@@ -1696,8 +1721,18 @@ identifier prefix, and an optional client config that will be applied to all
 clients created. For any zero value field in config, the default client
 config value will be used. If config is nil, the default client config will
 be used.
+
+Deprecated:  Use NewMultiClientV2 instead.
  */
 FOUNDATION_EXPORT NknMultiClient* _Nullable NknNewMultiClient(NknAccount* _Nullable account, NSString* _Nullable baseIdentifier, long numSubClients, BOOL originalClient, NknClientConfig* _Nullable config, NSError* _Nullable* _Nullable error);
+
+/**
+ * NewMultiClientV2 creates a MultiClient with an account, an optional identifier,
+and a optional client config. For any zero value field in config, the default
+client config value will be used. If config is nil, the default client config
+will be used.
+ */
+FOUNDATION_EXPORT NknMultiClient* _Nullable NknNewMultiClientV2(NknAccount* _Nullable account, NSString* _Nullable identifier, NknClientConfig* _Nullable config, NSError* _Nullable* _Nullable error);
 
 /**
  * NewOnConnect creates an OnConnect channel with a channel size and callback

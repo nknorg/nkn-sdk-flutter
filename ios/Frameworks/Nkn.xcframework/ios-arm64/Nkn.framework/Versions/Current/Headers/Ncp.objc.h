@@ -35,6 +35,7 @@
 @property (nonatomic) int32_t checkTimeoutInterval;
 @property (nonatomic) int32_t checkBytesReadInterval;
 @property (nonatomic) int32_t sendBytesReadThreshold;
+@property (nonatomic) BOOL verbose;
 @end
 
 @interface NcpConnection : NSObject <goSeqRefInterface> {
@@ -93,9 +94,12 @@
 
 // skipped method Session.GetConnWindowSize with unsupported parameter or return types
 
+// skipped method Session.GetContext with unsupported parameter or return types
+
 // skipped method Session.GetDataToSend with unsupported parameter or return types
 
 - (BOOL)isClosed;
+- (BOOL)isClosedByRemote;
 - (BOOL)isEstablished;
 - (BOOL)isStream;
 // skipped method Session.LocalAddr with unsupported parameter or return types

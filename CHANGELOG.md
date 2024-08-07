@@ -1,3 +1,7 @@
+## 0.6.1
+
+* Add programHash
+
 ## 0.6.0
 
 * Fix android receive message

@@ -13,8 +13,10 @@ import nkngolib.Nkngolib
 import nkngomobile.StringArray
 import org.bouncycastle.util.encoders.Hex
 import org.nkn.sdk.IChannelHandler
+import kotlin.math.log
 
-class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler, ViewModel() {
+class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.StreamHandler,
+    ViewModel() {
     companion object {
         val CHANNEL_NAME = "org.nkn.sdk/wallet"
     }
@@ -44,42 +46,63 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             "measureSeedRPCServer" -> {
                 measureSeedRPCServer(call, result)
             }
+
             "create" -> {
                 create(call, result)
             }
+
             "restore" -> {
                 restore(call, result)
             }
+
             "pubKeyToWalletAddr" -> {
                 pubKeyToWalletAddr(call, result)
             }
+
+            "programHashToAddr" -> {
+                programHashToAddr(call, result)
+            }
+
+            "pubKeyToProgramHash" -> {
+                pubKeyToProgramHash(call, result)
+            }
+
             "getBalance" -> {
                 getBalance(call, result)
             }
+
             "transfer" -> {
                 transfer(call, result)
             }
+
             "subscribe" -> {
                 subscribe(call, result)
             }
+
             "unsubscribe" -> {
                 unsubscribe(call, result)
             }
+
             "getSubscribersCount" -> {
                 getSubscribersCount(call, result)
             }
+
             "getSubscribers" -> {
                 getSubscribers(call, result)
             }
+
             "getSubscription" -> {
                 getSubscription(call, result)
             }
+
             "getHeight" -> {
                 getHeight(call, result)
             }
+
             "getNonce" -> {
                 getNonce(call, result)
             }
+
             else -> {
                 result.notImplemented()
             }
@@ -108,7 +131,7 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 }
 
                 val resp = hashMapOf(
-                        "seedRPCServerAddrList" to seedRPCServerAddrs
+                    "seedRPCServerAddrList" to seedRPCServerAddrs
                 )
                 resultSuccess(result, resp)
                 return@launch
@@ -137,12 +160,14 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             try {
                 val account = Nkn.newAccount(seed)
                 val wallet = Nkn.newWallet(account, config)
+                val pubKey = wallet.pubKey()
 
                 val resp = hashMapOf(
-                        "address" to wallet.address(),
-                        "keystore" to wallet.toJSON(),
-                        "publicKey" to wallet.pubKey(),
-                        "seed" to wallet.seed()
+                    "address" to wallet.address(),
+                    "keystore" to wallet.toJSON(),
+                    "publicKey" to pubKey,
+                    "seed" to wallet.seed(),
+                    "programHash" to Nkngolib.pubKeyToProgramHash(pubKey)
                 )
                 resultSuccess(result, resp)
                 return@launch
@@ -175,12 +200,13 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val wallet = Nkn.walletFromJSON(keystore, config)
-
+                val pubKey = wallet.pubKey()
                 val resp = hashMapOf(
-                        "address" to wallet.address(),
-                        "keystore" to wallet?.toJSON(),
-                        "publicKey" to wallet.pubKey(),
-                        "seed" to wallet.seed()
+                    "address" to wallet.address(),
+                    "keystore" to wallet?.toJSON(),
+                    "publicKey" to pubKey,
+                    "seed" to wallet.seed(),
+                    "programHash" to Nkngolib.pubKeyToProgramHash(pubKey)
                 )
                 resultSuccess(result, resp)
                 return@launch
@@ -192,12 +218,47 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
     }
 
     private fun pubKeyToWalletAddr(call: MethodCall, result: MethodChannel.Result) {
-        val pubkey = call.argument<String>("publicKey")
+        val pubkey = call.argument<ByteArray>("pubKey")
 
         viewModelScope.launch(Dispatchers.IO) {
-            val addr = Nkn.pubKeyToWalletAddr(Hex.decode(pubkey))
-            resultSuccess(result, addr)
-            return@launch
+            try {
+                val addr = Nkn.pubKeyToWalletAddr(pubkey)
+                resultSuccess(result, addr)
+                return@launch
+            } catch (e: Throwable) {
+                resultError(result, e)
+                return@launch
+            }
+        }
+    }
+
+    private fun programHashToAddr(call: MethodCall, result: MethodChannel.Result) {
+        val programHash = call.argument<ByteArray>("programHash")
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val addr = Nkngolib.programHashToAddr(programHash)
+                resultSuccess(result, addr)
+                return@launch
+            } catch (e: Throwable) {
+                resultError(result, e)
+                return@launch
+            }
+        }
+    }
+
+    private fun pubKeyToProgramHash(call: MethodCall, result: MethodChannel.Result) {
+        val pubkey = call.argument<ByteArray>("pubKey")
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val programHash = Nkngolib.pubKeyToProgramHash(pubkey)
+                resultSuccess(result, programHash)
+                return@launch
+            } catch (e: Throwable) {
+                resultError(result, e)
+                return@launch
+            }
         }
     }
 
@@ -297,7 +358,14 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
                 }
                 val account = Nkn.newAccount(seed)
                 val wallet = Nkn.newWallet(account, config)
-                val hash = wallet.subscribe(identifier, topic, duration.toLong(), meta, transactionConfig)
+                val hash =
+                    wallet.subscribe(
+                        identifier,
+                        topic,
+                        duration.toLong(),
+                        meta,
+                        transactionConfig
+                    )
 
                 resultSuccess(result, hash)
                 return@launch
@@ -364,7 +432,15 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val subscribers = Nkn.getSubscribers(topic, offset.toLong(), limit.toLong(), meta, txPool, subscriberHashPrefix, config)
+                val subscribers = Nkn.getSubscribers(
+                    topic,
+                    offset.toLong(),
+                    limit.toLong(),
+                    meta,
+                    txPool,
+                    subscriberHashPrefix,
+                    config
+                )
                 val resp = hashMapOf<String, String>()
                 subscribers.subscribers.range { addr, value ->
                     resp[addr] = value?.trim() ?: ""
@@ -397,8 +473,8 @@ class Wallet : IChannelHandler, MethodChannel.MethodCallHandler, EventChannel.St
             try {
                 val subscription = Nkn.getSubscription(topic, subscriber, config)
                 val resp = hashMapOf(
-                        "meta" to subscription.meta,
-                        "expiresAt" to subscription.expiresAt
+                    "meta" to subscription.meta,
+                    "expiresAt" to subscription.expiresAt
                 )
 
                 resultSuccess(result, resp)
