@@ -12,8 +12,6 @@
 
 #include "Nkn.objc.h"
 #include "Nkngomobile.objc.h"
-#include "Dnsresolver.objc.h"
-#include "Ethresolver.objc.h"
 
 FOUNDATION_EXPORT void NkngolibAddClientConfigWithDialContext(NknClientConfig* _Nullable config);
 

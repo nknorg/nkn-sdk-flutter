@@ -215,19 +215,19 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
         
         var error: NSError?
         
-        if (ethResolverConfigArray != nil) {
-            for (_, cfg) in ethResolverConfigArray!.enumerated() {
-                let ethResolverConfig: EthresolverConfig = EthresolverConfig()
-                ethResolverConfig.prefix = cfg["prefix"] as? String ?? ""
-                ethResolverConfig.rpcServer = cfg["rpcServer"] as! String
-                ethResolverConfig.contractAddress = cfg["contractAddress"] as! String
-                if (config.resolvers == nil) {
-                    config.resolvers = NkngomobileNewResolverArrayFromResolver(EthResolver(config: ethResolverConfig))
-                } else {
-                    config.resolvers?.append(EthResolver(config: ethResolverConfig))
-                }
-            }
-        }
+//        if (ethResolverConfigArray != nil) {
+//            for (_, cfg) in ethResolverConfigArray!.enumerated() {
+//                let ethResolverConfig: EthresolverConfig = EthresolverConfig()
+//                ethResolverConfig.prefix = cfg["prefix"] as? String ?? ""
+//                ethResolverConfig.rpcServer = cfg["rpcServer"] as! String
+//                ethResolverConfig.contractAddress = cfg["contractAddress"] as! String
+//                if (config.resolvers == nil) {
+//                    config.resolvers = NkngomobileNewResolverArrayFromResolver(EthResolver(config: ethResolverConfig))
+//                } else {
+//                    config.resolvers?.append(EthResolver(config: ethResolverConfig))
+//                }
+//            }
+//        }
         
         if (dnsResolverConfigArray != nil) {
             for (_, cfg) in dnsResolverConfigArray!.enumerated() {

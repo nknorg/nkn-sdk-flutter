@@ -1,3 +1,7 @@
+## 0.6.2
+
+* Fix gomobile compatibility issues
+
 ## 0.6.1
 
 * Add programHash
